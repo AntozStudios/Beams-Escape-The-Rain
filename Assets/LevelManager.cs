@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour
 GameObject startTop;
 [SerializeField] GameObject player;
 [SerializeField] GameObject LevelPartPrefab;
+[SerializeField] GameObject deathParent;
 
 
 [HideInInspector] public bool gameStarted;
@@ -117,6 +118,15 @@ public void destroyLevelParts()
     {
         Destroy(levelParts[0]);
         levelParts.RemoveAt(0);
+    }
+    if (deathParent.transform.childCount > 5)
+    {
+        GameObject temp = deathParent.transform.GetChild(0).gameObject;
+        if(temp!= null &&temp.name.Equals("GlowEffectParent")){
+            Destroy(deathParent.transform.GetChild(0));
+        }
+        
+   
     }
 }
 

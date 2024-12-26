@@ -48,23 +48,20 @@ void Awake(){
 
     void Update()
     {
-         if(levelManager.gameStarted){
-            levelCounter.gameObject.SetActive(true);
-            hideGameObjects();
-             if (canMove)
-        {
-            
-            HandleTouchInput();
-            HandleKeyboard();
-        }
 
-        }else{
-            levelCounter.gameObject.SetActive(false);
+        hideGameObjects(!levelManager.gameStarted);
+        levelCounter.gameObject.SetActive(levelManager.gameStarted);
+    
+
         
-        }
-       
+ 
+if(canMove){
+       HandleTouchInput();
+            HandleKeyboard();
+        
 
-       
+ }
+         
 
   
         
@@ -124,10 +121,10 @@ updatePlayerHasToMove();
     {
         if (Input.touchCount > 0)
         {
-            Touch touch = Input.GetTouch(0);
+            
+  Touch touch = Input.GetTouch(0);
 
-
-            // Beim Beginn des Wischens, Position speichern
+  // Beim Beginn des Wischens, Position speichern
             if (touch.phase == TouchPhase.Began)
             {
                 firstTouch = touch.position;
@@ -138,9 +135,18 @@ updatePlayerHasToMove();
             else if (touch.phase == TouchPhase.Ended)
             {
                 lastTouch = touch.position;
+                
                 HandleSwipe(firstTouch, lastTouch);
                 
             }
+
+
+            
+          
+
+
+
+          
         }
     }
 
@@ -200,8 +206,11 @@ updatePlayerHasToMove();
 
     void MovePlayer(Vector3 direction)
     {
-        transform.position += direction * movementSize;
+        if(canMove){
+ transform.position += direction * movementSize;
         soundManager.playSoundOneShot(SoundManager.SoundType.player, "player");
+        }
+       
     }
 
     
@@ -246,13 +255,14 @@ public void resetMovementCounters(){
 
 }
 
-private void hideGameObjects(){
+private void hideGameObjects( bool value){
     foreach(GameObject g in hideObjectWhenGameStarts){
-        g.SetActive(false);
+        g.SetActive(value);
     }
 }
 public void startGame(){
     levelManager.gameStarted = true;
+    canMove = true;
 }
 
 

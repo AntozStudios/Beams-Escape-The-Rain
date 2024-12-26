@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class CreatePopUp : MonoBehaviour
 {
     [SerializeField] GameObject prefab;
-    [SerializeField] Button button;
+  
     [SerializeField] string text;
     private GameObject thisGameobject;
 
@@ -24,8 +24,11 @@ public class CreatePopUp : MonoBehaviour
     }
      public void ClickCreatePopUp(){
         if(thisGameobject==null){
-thisGameobject = Instantiate(prefab,parentPanel);
+thisGameobject = Instantiate(prefab);
+if(text.Length>0){
 thisGameobject.GetComponent<PopUp>().text.text =text;
+}
+
         }
     }
 
