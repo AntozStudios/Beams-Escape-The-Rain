@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class RainCollision : MonoBehaviour
 {
+    
     public Vector3 initPos;
     [SerializeField] GameObject rainFallOutPrefab;
     GameObject levelManager;

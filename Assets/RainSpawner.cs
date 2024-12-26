@@ -43,7 +43,7 @@ void Awake(){
 
  
  for(int i =0;i<tops.Length;i++){
-    GameObject temp = Instantiate(rainPrefab);
+    GameObject temp = Instantiate(rainPrefab,transform);
     rainDrops[i] = temp;
  rainDrops[i].GetComponent<Renderer>().material = rainDrops[i].GetComponent<RainBehaviour>().materials[rainDrops[i].GetComponent<RainBehaviour>().getRandomMaterial()];
 

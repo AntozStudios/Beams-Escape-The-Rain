@@ -11,7 +11,7 @@ GameObject startTop;
 [SerializeField] GameObject LevelPartPrefab;
 
 
-
+[HideInInspector] public bool gameStarted;
 public List<GameObject> levelParts;
 
 [SerializeField] TMP_Text afkText;
@@ -124,15 +124,15 @@ public void destroyLevelParts()
 
 void levelUpater(){
     if(currentLevel>=0 && currentLevel<=25){
-       levelSettings(1000,6000,GameMode.grassMode,false);
+       levelSettings(2000,8000,GameMode.grassMode,false);
        currentMode = GameMode.grassMode.ToString();
     
     }else  if(currentLevel>25 && currentLevel<=50){
-        levelSettings(1000,8000,GameMode.iceMode,false);
+        levelSettings(3000,9000,GameMode.iceMode,false);
         currentMode = GameMode.iceMode.ToString();
     }
     else  if(currentLevel>50 && currentLevel<=100){
-        levelSettings(2000,8000,GameMode.sandMode,false);
+        levelSettings(4000,10000,GameMode.sandMode,false);
         currentMode = GameMode.sandMode.ToString();
     }
     else{
@@ -200,13 +200,13 @@ else if (gameMode == GameMode.iceMode){
 
 public void setAFKCounter(){
 if(currentMode.Equals(GameMode.grassMode.ToString())){
-player.GetComponent<PlayerMovement>().startAfkMax =10;
+player.GetComponent<PlayerMovement>().startAfkMax =6;
 
 }else if(currentMode.Equals(GameMode.iceMode.ToString())){
-    player.GetComponent<PlayerMovement>().startAfkMax =5;
+    player.GetComponent<PlayerMovement>().startAfkMax =4;
 }
 else if(currentMode.Equals(GameMode.sandMode.ToString())){
-    player.GetComponent<PlayerMovement>().startAfkMax =3;
+    player.GetComponent<PlayerMovement>().startAfkMax =2;
 }
 }
 

@@ -11,12 +11,16 @@ public class PlayerMovement : MonoBehaviour
     public int verticalMoves;
     public int horizontalMoves;
 
-    [SerializeField] TMP_Text swipeText;
+    public GameObject[] hideObjectWhenGameStarts;
+
+    
 [SerializeField] TMP_Text levelCounter;    
 
     [SerializeField] SoundManager soundManager;
 
-    bool gameStarted;
+    [SerializeField] LevelManager levelManager;
+
+  //  bool gameStarted;
 
 
 
@@ -44,19 +48,23 @@ void Awake(){
 
     void Update()
     {
-        if (canMove)
+         if(levelManager.gameStarted){
+            levelCounter.gameObject.SetActive(true);
+            hideGameObjects();
+             if (canMove)
         {
-            HandleKeyboard();
+            
             HandleTouchInput();
+            HandleKeyboard();
         }
 
-        if(gameStarted){
-            levelCounter.gameObject.SetActive(true);
-    swipeText.gameObject.SetActive(false);
         }else{
- levelCounter.gameObject.SetActive(false);
-    swipeText.gameObject.SetActive(true);
+            levelCounter.gameObject.SetActive(false);
+        
         }
+       
+
+       
 
   
         
@@ -108,9 +116,7 @@ updatePlayerHasToMove();
                 verticalMoves -= 1;
             }
         }
-        if(Input.anyKey){
-            gameStarted = true;
-        }
+        
 
     }
 
@@ -125,7 +131,7 @@ updatePlayerHasToMove();
             if (touch.phase == TouchPhase.Began)
             {
                 firstTouch = touch.position;
-                gameStarted = true;
+                
                 
             }
             // Beim Ende des Wischens, Position prüfen und entscheiden, in welche Richtung der Spieler bewegt wird
@@ -133,7 +139,7 @@ updatePlayerHasToMove();
             {
                 lastTouch = touch.position;
                 HandleSwipe(firstTouch, lastTouch);
-                gameStarted = true;
+                
             }
         }
     }
@@ -238,6 +244,15 @@ public void resetMovementCounters(){
     verticalMoves =0;
     horizontalMoves =0;
 
+}
+
+private void hideGameObjects(){
+    foreach(GameObject g in hideObjectWhenGameStarts){
+        g.SetActive(false);
+    }
+}
+public void startGame(){
+    levelManager.gameStarted = true;
 }
 
 
