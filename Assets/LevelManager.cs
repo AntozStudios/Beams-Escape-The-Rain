@@ -119,11 +119,11 @@ public void destroyLevelParts()
         Destroy(levelParts[0]);
         levelParts.RemoveAt(0);
     }
-    if (deathParent.transform.childCount > 5)
+    if (deathParent.transform.childCount > 3)
     {
         GameObject temp = deathParent.transform.GetChild(0).gameObject;
         if(temp!= null &&temp.name.Equals("GlowEffectParent")){
-            Destroy(deathParent.transform.GetChild(0));
+            Destroy(deathParent.transform.GetChild(0).gameObject);
         }
         
    
