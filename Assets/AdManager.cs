@@ -138,8 +138,6 @@ _adUnitId = "ca-app-pub-1320039869895590/5136125260";
             Debug.Log(String.Format(rewardMsg, reward.Type, reward.Amount));
             player.GetComponent<PlayerCollision>().amountLife+=(int) reward.Amount; player.GetComponent<PlayerCollision>().revivePlayer(); levelManager.setPlayerToStartTop(); adUsed++;
         });
-    }else{
-        SceneManager.LoadScene(0);
     }
 
 
@@ -189,6 +187,7 @@ private void RegisterEventHandlers(RewardedInterstitialAd ad)
                  //      "full screen content with error : " + error);
                  LoadInterstitialAd();
     };
+    
 }
 
   

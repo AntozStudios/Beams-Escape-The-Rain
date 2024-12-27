@@ -56,11 +56,21 @@ void Awake(){
         
  
 if(canMove){
-       HandleTouchInput();
-            HandleKeyboard();
-        
+     
+  
 
- }
+       HandleKeyboard();
+       HandleTouchInput();
+      
+    
+  
+        
+}
+  
+
+   
+
+
          
 
   
@@ -118,38 +128,29 @@ updatePlayerHasToMove();
     }
 
     void HandleTouchInput()
+{
+    // Eingaben nur zulassen, wenn das Spiel gestartet ist
+    if ( Input.touchCount > 0)
     {
-        if (Input.touchCount > 0)
+        Touch touch = Input.GetTouch(0);
+        
+
+        // Beim Beginn des Wischens, Position speichern
+        if (touch.phase == TouchPhase.Began)
         {
+            firstTouch = touch.position;
+        }
+        // Beim Ende des Wischens, Position prüfen und entscheiden, in welche Richtung der Spieler bewegt wird
+        else if (touch.phase == TouchPhase.Ended)
+        {
+            lastTouch = touch.position;
             
-  Touch touch = Input.GetTouch(0);
-
-  // Beim Beginn des Wischens, Position speichern
-            if (touch.phase == TouchPhase.Began)
-            {
-                firstTouch = touch.position;
-                
-                
-            }
-            // Beim Ende des Wischens, Position prüfen und entscheiden, in welche Richtung der Spieler bewegt wird
-            else if (touch.phase == TouchPhase.Ended)
-            {
-                lastTouch = touch.position;
-                
-                HandleSwipe(firstTouch, lastTouch);
-                
-            }
-
-
+            HandleSwipe(firstTouch, lastTouch);
             
-          
-
-
-
-          
+            
         }
     }
-
+}
     void HandleSwipe(Vector2 startTouch, Vector2 endTouch)
     {
         float swipeThreshold = 100f; // Mindest-Swipe-Länge für eine Bewegung
@@ -209,6 +210,7 @@ updatePlayerHasToMove();
         if(canMove){
  transform.position += direction * movementSize;
         soundManager.playSoundOneShot(SoundManager.SoundType.player, "player");
+        levelManager.gameStarted = true;
         }
        
     }
@@ -263,6 +265,7 @@ private void hideGameObjects( bool value){
 public void startGame(){
     levelManager.gameStarted = true;
     canMove = true;
+
 }
 
 
