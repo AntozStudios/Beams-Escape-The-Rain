@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -26,8 +27,6 @@ public int currentLevel;
 [SerializeField] 
 
  Material sandMaterial,iceMaterial,grassMaterial;
-
- int materialCounter;
 
 
 
@@ -71,7 +70,6 @@ setPlayerToStartTop();
     
 
 
-
 displayAFKCounter();
 
 
@@ -104,9 +102,7 @@ nextLevelParent.transform.position = new Vector3(lastLevelParentChildren.transfo
 lastLevelParentChildren.transform.position.y,lastLevelParentChildren.transform.position.z+nextLevelParentChildren.transform.localScale.z);
 levelUpater();
 destroyLevelParts();
-if(currentLevel>=100){
-    materialCounter++;
-}
+
    
 
  
@@ -146,22 +142,15 @@ void levelUpater(){
         currentMode = GameMode.sandMode.ToString();
     }
     else{
-   
-   if(materialCounter==0){
-        levelSettings(5000,10000,GameMode.grassMode,false);
-        currentMode = GameMode.grassMode.ToString();
-   }else if(materialCounter==1){
-            levelSettings(5000,10000,GameMode.iceMode,false);
-            currentMode = GameMode.iceMode.ToString();
-   }
-   else if(materialCounter==2){
-            levelSettings(5000,10000,GameMode.sandMode,false);
-            currentMode = GameMode.sandMode.ToString();
-   }
-   else{
-    materialCounter=0;
-   }
-    
+
+
+   int count = Enum.GetValues(typeof(GameMode)).Length;
+   int randomMaterial = UnityEngine.Random.Range(0,count);
+   Debug.Log(randomMaterial);
+   Debug.Log(currentMode);
+   currentMode = Enum.GetName(typeof(GameMode),randomMaterial).ToString();
+
+    levelSettings(5000,10000,(GameMode)randomMaterial,false);
     }
     setAFKCounter();
     
