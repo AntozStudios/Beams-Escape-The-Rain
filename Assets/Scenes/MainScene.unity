@@ -2040,6 +2040,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canMove: 1
   verticalMoves: 0
+  popUpContainer: {fileID: 1389413449}
   horizontalMoves: 0
   hideObjectWhenGameStarts:
   - {fileID: 312648399}
@@ -2138,6 +2139,53 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 517.23834, y: 1875.2339, z: -4.662085}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1389413449
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1389413451}
+  - component: {fileID: 1389413450}
+  m_Layer: 0
+  m_Name: PopUpContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1389413450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1389413449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b60981b56f08bc446914c85bd30b961b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameObjects:
+  - {fileID: 8661835107065473513, guid: 9832f4e9346c3cf42810b299dfb83a16, type: 3}
+  - {fileID: 8661835107065473513, guid: 9f360ff81b3282246b9643b1c088ecfc, type: 3}
+--- !u!4 &1389413451
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1389413449}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 229.88234, y: 426.9862, z: -4.956996}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7933,6 +7981,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1257010137}
+        m_TargetAssemblyTypeName: CreatePopUp, Assembly-CSharp
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1862652669
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7984,8 +8044,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 8661835107065473513, guid: 9f360ff81b3282246b9643b1c088ecfc, type: 3}
+  popUpContainer: {fileID: 1389413450}
   index: 1
   text: 
+  parentPanel: {fileID: 1801889553}
 --- !u!1 &1865902081
 GameObject:
   m_ObjectHideFlags: 0
@@ -8076,8 +8138,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefab: {fileID: 8661835107065473513, guid: 9832f4e9346c3cf42810b299dfb83a16, type: 3}
+  popUpContainer: {fileID: 1389413450}
   index: 0
   text: 
+  parentPanel: {fileID: 1801889553}
 --- !u!114 &1889653230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8129,6 +8193,18 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1257010137}
+        m_TargetAssemblyTypeName: CreatePopUp, Assembly-CSharp
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -24925,3 +25001,4 @@ SceneRoots:
   - {fileID: 929970219}
   - {fileID: 672442504}
   - {fileID: 1821091306}
+  - {fileID: 1389413451}
