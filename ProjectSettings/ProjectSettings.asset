@@ -269,7 +269,7 @@ PlayerSettings:
   AndroidTargetArchitectures: 3
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: G:/Meine Ablage/Play Store/Beams.keystore
+  AndroidKeystoreName: C:/Users/matte/Desktop/Beams/Beams.keystore
   AndroidKeyaliasName: matteo
   AndroidEnableArmv9SecurityFeatures: 0
   AndroidEnableArm64MTE: 0

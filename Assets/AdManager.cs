@@ -20,6 +20,7 @@ using UnityEngine.SceneManagement;
 public class AdManager : MonoBehaviour
 {
 
+[SerializeField] GameObject deathPanel;
   [SerializeField] GameObject player;
   [SerializeField] Button adButton;
 
@@ -29,6 +30,7 @@ public class AdManager : MonoBehaviour
   private const int MAX_ADS = 3;
  
  
+
 
   private string rewardID;
  [HideInInspector] public string bannerID;
@@ -146,6 +148,7 @@ public void ShowRewardedInterstitialAd()
             player.GetComponent<PlayerCollision>().revivePlayer();
             levelManager.setPlayerToStartTop();
             adUsed++;
+            deathPanel.GetComponent<AdBannerManager>().DestroyAd();
         });
     }
     else

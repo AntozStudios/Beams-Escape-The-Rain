@@ -17,7 +17,7 @@ public class ArchivementManager : MonoBehaviour
 
 
     private GameObject player;
-    private Camera playerCamera;
+
     private ParticleSystem playerEffect;
 
 private static ArchivementManager instance;
@@ -43,7 +43,7 @@ private static ArchivementManager instance;
         initAllItems();
         categoryContent.GetChild(0).GetComponent<Button>().onClick.AddListener(()=>initAllItems());
         player = GameObject.FindWithTag("Player").gameObject;
-        playerCamera = Camera.main;
+    
         playerEffect = player.GetComponent<PlayerChildren>().playerHit_ParticleSystem;
     
         initButtons();
@@ -69,7 +69,7 @@ private static ArchivementManager instance;
             PlayerPrefs.SetInt("lastCubeMaterial",index);
         }
         else if(items[index].itemCategory.Equals(ItemCategory.skyColor)){
-            playerCamera.backgroundColor = items[index].color;
+            Camera.main.backgroundColor = items[index].color;
             PlayerPrefs.SetFloat("lastCameraColorR",items[index].color.r);
             PlayerPrefs.SetFloat("lastCameraColorG",items[index].color.g);
             PlayerPrefs.SetFloat("lastCameraColorB",items[index].color.b);
@@ -165,19 +165,24 @@ void initAllItems(){
        
 }
 
-public static void ApplySavedItems(GameObject player, Camera playerCamera) {
+public static void ApplySavedItems(GameObject player) {
     
 if(PlayerPrefs.GetInt("lastCubeMaterial")>0){
  player.GetComponent<Renderer>().material = instance.items[PlayerPrefs.GetInt("lastCubeMaterial")].material;
 }
   
-
-    Color tempColor = new Color(
+  if(PlayerPrefs.GetFloat("lastCameraColorR")>0 && 
+  PlayerPrefs.GetFloat("lastCameraColorG")>0 &&
+   PlayerPrefs.GetFloat("lastCameraColorB")>0){
+Color tempColor = new Color(
         PlayerPrefs.GetFloat("lastCameraColorR"),
         PlayerPrefs.GetFloat("lastCameraColorG"),
         PlayerPrefs.GetFloat("lastCameraColorB")
     );
-    playerCamera.backgroundColor = tempColor;
+    Camera.main.backgroundColor = tempColor;
+   }
+
+    
 }
 
 

@@ -8,8 +8,11 @@ public class Config : MonoBehaviour
     
     // Start is called before the first frame update
    void Awake(){
-    ArchivementManager.ApplySavedItems(player,player.GetComponent<PlayerChildren>().playerCamera);
+    ArchivementManager.ApplySavedItems(player);
     Application.targetFrameRate = (int)Screen.currentResolution.refreshRateRatio.value;
+   }
+   void Start(){
+
    }
     // Update is called once per frame
     void Update()
