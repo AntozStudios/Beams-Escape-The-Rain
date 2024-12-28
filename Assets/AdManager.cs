@@ -28,10 +28,19 @@ public class AdManager : MonoBehaviour
   [SerializeField] bool isTesting;
   private const int MAX_ADS = 3;
  
+ 
 
-  private string _adUnitId;
+  private string rewardID;
+ [HideInInspector] public string bannerID;
+
+ [HideInInspector]public ConsentRequestParameters request;
+
+  /// <summary>
+  /// /////////////////// Banner
+  /// </summary>
 
 
+ [HideInInspector]public BannerView _bannerView;
   
   private RewardedInterstitialAd  _rewardedInitAd;
     public void Awake()
@@ -43,10 +52,14 @@ public class AdManager : MonoBehaviour
     // Check the current consent information status.
     ConsentInformation.Update(request, OnConsentInfoUpdated);
 if(isTesting){
-  _adUnitId ="ca-app-pub-3940256099942544/5354046379";
+  rewardID ="ca-app-pub-3940256099942544/5354046379";
+  bannerID ="ca-app-pub-3940256099942544/6300978111";
 }else{
-_adUnitId = "ca-app-pub-1320039869895590/5136125260";
+rewardID = "ca-app-pub-1320039869895590/5136125260";
+bannerID="ca-app-pub-1320039869895590/6775514145";
 }
+
+
 
       
     }
@@ -98,7 +111,7 @@ _adUnitId = "ca-app-pub-1320039869895590/5136125260";
 
     var adRequest = new AdRequest();
 
-    RewardedInterstitialAd.Load(_adUnitId, adRequest,
+    RewardedInterstitialAd.Load(rewardID, adRequest,
         (RewardedInterstitialAd ad, LoadAdError error) =>
         {
             if (error != null || ad == null)
@@ -145,7 +158,7 @@ public void ShowRewardedInterstitialAd()
 
 public void Update(){
     adButton.gameObject.SetActive(adUsed<MAX_ADS);
-    
+ 
 
 }
 
@@ -189,6 +202,9 @@ private void RegisterEventHandlers(RewardedInterstitialAd ad)
     };
     
 }
+/////////////////////////////Banner
+///
 
-  
+
 }
+
