@@ -703,8 +703,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 944296215341642211}
   m_HandleRect: {fileID: 409153776886566497}
   m_Direction: 2
-  m_Value: 0.99999714
-  m_Size: 0.92727053
+  m_Value: 1.0000076
+  m_Size: 0.9272701
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -955,7 +955,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5898137533168915457}
   m_HandleRect: {fileID: 2284424042637923143}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1026,7 +1026,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Archivments
+  m_text: Achivments
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e46df789b12aecd4c82b64b170dbb446, type: 2}
   m_sharedMaterial: {fileID: -5631600966435474730, guid: e46df789b12aecd4c82b64b170dbb446, type: 2}
@@ -1287,7 +1287,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4829682232069906939}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1296,11 +1296,11 @@ RectTransform:
   - {fileID: 4832023824447969596}
   - {fileID: 2293767532603697452}
   - {fileID: 5597413654186333914}
-  m_Father: {fileID: 5617472959341133036}
+  m_Father: {fileID: 7576300454233764419}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.010976, y: 0}
+  m_AnchoredPosition: {x: -0.0062498897, y: 0}
   m_SizeDelta: {x: 1385.5, y: 2000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6310916349664843467
@@ -1352,6 +1352,7 @@ GameObject:
   - component: {fileID: 7576300454233764419}
   - component: {fileID: 2020281335808465037}
   - component: {fileID: 986809356253240318}
+  - component: {fileID: 4868256579279193672}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -1370,12 +1371,13 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4573222192513379105}
   m_Father: {fileID: 5617472959341133036}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -3085}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2020281335808465037
@@ -1399,7 +1401,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.007843138}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1416,6 +1418,28 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!95 &4868256579279193672
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5522214990452921762}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0edcd7af3dafc9e4c983d26e99ae30b2, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &5627552680987799346
 GameObject:
   m_ObjectHideFlags: 0
@@ -1536,7 +1560,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5384495514658801209}
   m_HandleRect: {fileID: 6435778583344174901}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1930,8 +1954,8 @@ GameObject:
   - component: {fileID: 418610909118233690}
   - component: {fileID: 4366254036533334032}
   m_Layer: 5
-  m_Name: ArchivmentPanel
-  m_TagString: Untagged
+  m_Name: AchivmentPanel
+  m_TagString: PopUp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1949,7 +1973,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7576300454233764419}
-  - {fileID: 4573222192513379105}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2063,7 +2086,7 @@ MonoBehaviour:
     _gameObject: {fileID: 0}
     itemCategory: 0
     itemName: Red Cube
-    levelToUnlock: 25
+    levelToUnlock: 40
   - material: {fileID: 2100000, guid: adf69f8ba56772a479e2b03ca2227f3f, type: 2}
     color: {r: 0, g: 0, b: 0, a: 0}
     _gameObject: {fileID: 0}
@@ -2093,7 +2116,7 @@ MonoBehaviour:
     _gameObject: {fileID: 0}
     itemCategory: 1
     itemName: Purple Sky
-    levelToUnlock: 75
+    levelToUnlock: 35
   - material: {fileID: 2100000, guid: 85a4262bbefdcea45b2938dc28819069, type: 2}
     color: {r: 1, g: 1, b: 1, a: 0}
     _gameObject: {fileID: 0}

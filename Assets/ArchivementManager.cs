@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Unity.VisualStudio.Editor;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
-using Button = UnityEngine.UI.Button;
-using Image = UnityEngine.UI.Image;
+
+
 
 public class ArchivementManager : MonoBehaviour
 {
@@ -44,8 +42,8 @@ private static ArchivementManager instance;
     DontDestroyOnLoad(gameObject); // Damit der Manager nicht beim Szenenwechsel gelöscht wird
         initAllItems();
         categoryContent.GetChild(0).GetComponent<Button>().onClick.AddListener(()=>initAllItems());
-        player = GameObject.Find("Player").gameObject;
-        playerCamera = player.GetComponent<PlayerChildren>().playerCamera;
+        player = GameObject.FindWithTag("Player").gameObject;
+        playerCamera = Camera.main;
         playerEffect = player.GetComponent<PlayerChildren>().playerHit_ParticleSystem;
     
         initButtons();
@@ -169,7 +167,10 @@ void initAllItems(){
 
 public static void ApplySavedItems(GameObject player, Camera playerCamera) {
     
-   player.GetComponent<Renderer>().material = instance.items[PlayerPrefs.GetInt("lastCubeMaterial")].material;
+if(PlayerPrefs.GetInt("lastCubeMaterial")>0){
+ player.GetComponent<Renderer>().material = instance.items[PlayerPrefs.GetInt("lastCubeMaterial")].material;
+}
+  
 
     Color tempColor = new Color(
         PlayerPrefs.GetFloat("lastCameraColorR"),

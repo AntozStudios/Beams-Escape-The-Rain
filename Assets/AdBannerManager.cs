@@ -9,9 +9,10 @@ public class AdBannerManager : MonoBehaviour
    void Start(){
 
 
-CreateBannerView();
-ListenToAdEvents();
+
+
 LoadAd();
+ListenToAdEvents();
    }
             void OnConsentInfoUpdated(FormError consentError)
 {

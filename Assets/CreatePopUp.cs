@@ -1,25 +1,30 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CreatePopUp : MonoBehaviour
 {
     [SerializeField] GameObject prefab;
-  
+    
+
+  public int index;
     [SerializeField] string text;
     private GameObject thisGameobject;
-
-    [SerializeField] Transform parentPanel;
+    
+ 
+    
     void Start()
     {
         
-        
+         
     }
 
     // Update is called once per frame
     void Update()
     {
     
+
         
     }
      public void ClickCreatePopUp(){
@@ -30,7 +35,12 @@ thisGameobject.GetComponent<PopUp>().text.text =text;
 }
 
         }
+        
     }
+
+  
+
+   
 
    
 }

@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
     public bool canMove;
 
     public int verticalMoves;
+
     public int horizontalMoves;
 
     public GameObject[] hideObjectWhenGameStarts;
@@ -53,20 +54,20 @@ void Awake(){
         levelCounter.gameObject.SetActive(levelManager.gameStarted);
     
 
-        
- 
-if(canMove){
+       
+if(canMove ){
      
   
 
        HandleKeyboard();
        HandleTouchInput();
-      
-    
+        
   
         
-}
+
   
+
+        }
 
    
 
