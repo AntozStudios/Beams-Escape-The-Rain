@@ -86,39 +86,34 @@ _adUnitId = "ca-app-pub-1320039869895590/5136125260";
     });
 }
 
-    private void LoadInterstitialAd()
+   private void LoadInterstitialAd()
+{
+    if (_rewardedInitAd != null)
     {
-        // Clean up the old ad before loading a new one.
-      if (_rewardedInitAd != null)
-      {
-            _rewardedInitAd.Destroy();
-            _rewardedInitAd = null;
-      }
-
-      Debug.Log("Loading the rewarded interstitial ad.");
-
-      // create our request used to load the ad.
-      var adRequest = new AdRequest();
-      adRequest.Keywords.Add("unity-admob-sample");
-
-      // send the request to load the ad.
-      RewardedInterstitialAd.Load(_adUnitId, adRequest,
-          (RewardedInterstitialAd ad, LoadAdError error) =>
-          {
-              // if error is not null, the load request failed.
-              if (error != null || ad == null)
-              {
-                  Debug.LogError("rewarded interstitial ad failed to load an ad " +
-                                 "with error : " + error);
-                  return;
-              }
-
-              Debug.Log("Rewarded interstitial ad loaded with response : "
-                        + ad.GetResponseInfo());
-
-              _rewardedInitAd = ad;
-          });
+        _rewardedInitAd.Destroy();
+        _rewardedInitAd = null;
     }
+
+    Debug.Log("Lade neue Rewarded-Interstitial-Anzeige...");
+
+    var adRequest = new AdRequest();
+
+    RewardedInterstitialAd.Load(_adUnitId, adRequest,
+        (RewardedInterstitialAd ad, LoadAdError error) =>
+        {
+            if (error != null || ad == null)
+            {
+                Debug.LogError("Anzeige konnte nicht geladen werden: " + error);
+                return;
+            }
+
+            Debug.Log("Anzeige erfolgreich geladen.");
+            _rewardedInitAd = ad;
+
+            // Registriere Events
+            RegisterEventHandlers(_rewardedInitAd);
+        });
+}
 
     /// <summary>
     /// Loads the rewarded ad.
@@ -126,23 +121,27 @@ _adUnitId = "ca-app-pub-1320039869895590/5136125260";
    
 
 
-   public void ShowRewardedInterstitialAd()
+public void ShowRewardedInterstitialAd()
 {
-    const string rewardMsg =
-        "Rewarded interstitial ad rewarded the user. Type: {0}, amount: {1}.";
-
     if (_rewardedInitAd != null && _rewardedInitAd.CanShowAd())
     {
         _rewardedInitAd.Show((Reward reward) =>
         {
-            // TODO: Reward the user.
-            Debug.Log(String.Format(rewardMsg, reward.Type, reward.Amount));
-            player.GetComponent<PlayerCollision>().amountLife+=(int) reward.Amount; player.GetComponent<PlayerCollision>().revivePlayer(); levelManager.setPlayerToStartTop(); adUsed++;
+            Debug.Log($"Belohnung erhalten: {reward.Type}, Menge: {reward.Amount}");
+            // Belohnungslogik hier
+            player.GetComponent<PlayerCollision>().amountLife += (int)reward.Amount;
+            player.GetComponent<PlayerCollision>().revivePlayer();
+            levelManager.setPlayerToStartTop();
+            adUsed++;
         });
     }
-
-
+    else
+    {
+        Debug.LogWarning("Anzeige nicht bereit. Versuche, neu zu laden...");
+        LoadInterstitialAd();
     }
+}
+
 
 public void Update(){
     adButton.gameObject.SetActive(adUsed<MAX_ADS);

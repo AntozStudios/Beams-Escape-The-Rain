@@ -2062,7 +2062,7 @@ MonoBehaviour:
     color: {r: 0, g: 0, b: 0, a: 0}
     _gameObject: {fileID: 0}
     itemCategory: 0
-    itemName: Blue Cube
+    itemName: Red Cube
     levelToUnlock: 25
   - material: {fileID: 2100000, guid: adf69f8ba56772a479e2b03ca2227f3f, type: 2}
     color: {r: 0, g: 0, b: 0, a: 0}
@@ -2077,7 +2077,7 @@ MonoBehaviour:
     itemName: Default Sky
     levelToUnlock: 0
   - material: {fileID: 0}
-    color: {r: 0, g: 0.30556446, b: 0.49056602, a: 1}
+    color: {r: 0, g: 0.17660381, b: 0.2830189, a: 1}
     _gameObject: {fileID: 0}
     itemCategory: 1
     itemName: Blue Sky
@@ -2089,7 +2089,7 @@ MonoBehaviour:
     itemName: Red Sky
     levelToUnlock: 50
   - material: {fileID: 0}
-    color: {r: 0.42352942, g: 0, b: 0.24477458, a: 0}
+    color: {r: 0.3018868, g: 0, b: 0.17330544, a: 0}
     _gameObject: {fileID: 0}
     itemCategory: 1
     itemName: Purple Sky
@@ -2100,12 +2100,18 @@ MonoBehaviour:
     itemCategory: 0
     itemName: Green Cube
     levelToUnlock: 75
-  - material: {fileID: 2100000, guid: 85a4262bbefdcea45b2938dc28819069, type: 2}
+  - material: {fileID: 0}
     color: {r: 0, g: 0, b: 0, a: 0}
     _gameObject: {fileID: 0}
     itemCategory: 1
     itemName: Black Sky
     levelToUnlock: 10
+  - material: {fileID: 0}
+    color: {r: 0.5471698, g: 0.52946204, b: 0, a: 0}
+    _gameObject: {fileID: 0}
+    itemCategory: 1
+    itemName: Yellow Sky
+    levelToUnlock: 5
 --- !u!1 &8663634721738654136
 GameObject:
   m_ObjectHideFlags: 0

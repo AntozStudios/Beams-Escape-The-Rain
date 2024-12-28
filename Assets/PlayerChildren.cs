@@ -1,19 +1,34 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using Unity.VisualScripting;
 
 public class PlayerChildren : MonoBehaviour
 {
     public Light playerLight;
     public ParticleSystem playerHit_ParticleSystem;
-   public ParticleSystem rainHit_ParticleSystem;
- public ParticleSystem stars_ParticleSystem;
-public Camera playerCamera;
+    public ParticleSystem rainHit_ParticleSystem;
+    public ParticleSystem stars_ParticleSystem;
+    public Camera playerCamera;
+    
+    private Renderer playerRenderer;
 
-void Awake(){
-    playerLight.color = GetComponent<Renderer>().material.color;
-}
-  void Update()
+    void Awake()
     {
-            playerLight.color = GetComponent<Renderer>().material.color;
-        
+        playerRenderer = GetComponent<Renderer>();
+
+        playerLight.color = playerRenderer.material.color;
+
+        var main = playerHit_ParticleSystem.GetComponent<Renderer>();
+        main.material = playerRenderer.material;
+    }
+
+    void Update()
+    {
+        playerLight.color = playerRenderer.material.color;
+
+          var main = playerHit_ParticleSystem.GetComponent<Renderer>();
+        main.material = playerRenderer.material;
     }
 }
