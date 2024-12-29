@@ -16,7 +16,7 @@ public class PlayerCollision : MonoBehaviour
    [SerializeField] Transform deathParent;
    [SerializeField] SoundManager soundManager;
    [SerializeField] GameManager gameManager;
-   [SerializeField] GoogleIntegration googleIntegration;
+  
   
    
    
@@ -109,7 +109,6 @@ public void loose(){
 if(PlayerPrefs.GetInt("HighScore")==0){
 if(levelManager.currentLevel>0){
   PlayerPrefs.SetInt("HighScore",levelManager.currentLevel);
-  googleIntegration.PostHighScore(levelManager.currentLevel, "CgkIgfWTvrYGEAIQAg"); 
 
 }
 }else{
