@@ -11,7 +11,7 @@ public class PopUp : MonoBehaviour
     [SerializeField] GameObject thisPopUp;
     [HideInInspector]public TMP_Text text;
 
-    [SerializeField] bool dontDestroy;
+    [SerializeField] bool destroyObject;
 
       GameObject player;
     
@@ -21,11 +21,10 @@ void Awake(){
 }
 
 void Start(){
-   GetComponentInChildren<Animator>().SetTrigger("start");
    show();
 }
 void OnDestroy(){
-    if(dontDestroy){
+    if(!destroyObject){
 player.GetComponent<PlayerMovement>().canMove = true;
     }
 
@@ -33,19 +32,29 @@ player.GetComponent<PlayerMovement>().canMove = true;
 
 
     public void DestroyPopUp(){
-        if(dontDestroy){
- Destroy(thisPopUp);
-        }else{
+        
       GetComponentInChildren<Animator>().SetTrigger("hide");
-        }
+      
        
         
     }
 
     void Update(){
-    if(!GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0).IsName("PopUpIdle")){
+    if(!destroyObject){
+ if(GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0).IsName("PopUpIdle")){
 player.GetComponent<PlayerMovement>().canMove = false;
+    }else{
+        player.GetComponent<PlayerMovement>().canMove = true;
     }
+    }
+   
+
+    if(destroyObject){
+        if(GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0).IsName("PopUpExit")){
+            Destroy(gameObject);
+        }
+    }
+    
     
     }
 

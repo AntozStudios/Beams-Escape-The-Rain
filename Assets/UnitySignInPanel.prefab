@@ -1990,7 +1990,7 @@ MonoBehaviour:
   exitButton: {fileID: 684126454168600445}
   thisPopUp: {fileID: 8661835107065473513}
   text: {fileID: 0}
-  dontDestroy: 0
+  destroyObject: 0
 --- !u!114 &5858977536544014939
 MonoBehaviour:
   m_ObjectHideFlags: 0

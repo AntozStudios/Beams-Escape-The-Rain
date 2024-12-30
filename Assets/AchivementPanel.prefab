@@ -703,8 +703,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 944296215341642211}
   m_HandleRect: {fileID: 409153776886566497}
   m_Direction: 2
-  m_Value: 0.99999714
-  m_Size: 0.9272706
+  m_Value: 1.0000076
+  m_Size: 0.9272701
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -955,7 +955,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5898137533168915457}
   m_HandleRect: {fileID: 2284424042637923143}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1560,7 +1560,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5384495514658801209}
   m_HandleRect: {fileID: 6435778583344174901}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2058,6 +2058,7 @@ MonoBehaviour:
   exitButton: {fileID: 684126454168600445}
   thisPopUp: {fileID: 8661835107065473513}
   text: {fileID: 0}
+  destroyObject: 0
 --- !u!114 &4366254036533334032
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
+using Unity.Services.CloudSave;
 using Unity.Services.Core;
 using UnityEngine;
 using UnityEngine.UI;
@@ -143,5 +145,16 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
         {
             m_ExceptionText.text = ex != null ? $"{ex.GetType().Name}: {ex.Message}" : "";
         }
+        async void SaveData()
+{
+    var data = new Dictionary<string, object>
+    {
+        { "HighScore", 12345 }
+    };
+    await CloudSaveService.Instance.Data.ForceSaveAsync(data);
+}
     }
+
+
+    
 }
