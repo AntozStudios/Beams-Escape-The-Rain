@@ -34,6 +34,8 @@ if(text.Length>0){
 thisGameobject.GetComponent<PopUp>().text.text =text;
 }
 
+        }else{
+          thisGameobject.GetComponentInChildren<PopUp>().show();
         }
         
     }
