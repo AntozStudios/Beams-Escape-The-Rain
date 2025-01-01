@@ -2056,9 +2056,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   exitButton: {fileID: 684126454168600445}
-  thisPopUp: {fileID: 8661835107065473513}
   text: {fileID: 0}
-  destroyObject: 0
+  destroyObject: 1
 --- !u!114 &4366254036533334032
 MonoBehaviour:
   m_ObjectHideFlags: 0

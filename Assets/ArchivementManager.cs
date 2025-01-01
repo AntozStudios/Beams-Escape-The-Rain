@@ -47,6 +47,7 @@ private static ArchivementManager instance;
         playerEffect = player.GetComponent<PlayerChildren>().playerHit_ParticleSystem;
     
         initButtons();
+    
 
         
     }

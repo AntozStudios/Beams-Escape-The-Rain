@@ -1,6 +1,7 @@
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class CreatePopUp : MonoBehaviour
@@ -11,6 +12,18 @@ public class CreatePopUp : MonoBehaviour
   public int index;
     [SerializeField] string text;
     private GameObject thisGameobject;
+   
+
+    void Awake(){
+
+if(GameObject.Find(prefab.name)!=null){
+     thisGameobject= GameObject.Find(prefab.name);
+   
+}
+
+
+     
+    }
     
  
     
@@ -42,7 +55,9 @@ thisGameobject.GetComponent<PopUp>().text.text =text;
 
   
 
-   
+   public void showPopUp(){
+    thisGameobject.GetComponent<PopUp>().show();
+   }
 
    
 }

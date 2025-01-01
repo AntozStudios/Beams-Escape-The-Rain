@@ -2004,6 +2004,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_StatusText: {fileID: 2746345794539877357}
-  m_ExceptionText: {fileID: 5879432414178518643}
+  m_ExceptionText: {fileID: 0}
   m_SignOut: {fileID: 1750882808809212916}
   m_PlayerAccountSignOut: {fileID: 1677639844881027916}

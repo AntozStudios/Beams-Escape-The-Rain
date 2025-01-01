@@ -70,11 +70,6 @@ if(canMove ){
         }
 
    
-
-
-         
-
-  
         
         
 updatePlayerHasToMove();

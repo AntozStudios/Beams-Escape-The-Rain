@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
+using Unity.Services.Authentication.PlayerAccounts.Samples;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
@@ -11,6 +13,8 @@ GameObject startTop;
 [SerializeField] GameObject player;
 [SerializeField] GameObject LevelPartPrefab;
 [SerializeField] GameObject deathParent;
+
+
 
 
 [HideInInspector] public bool gameStarted;
@@ -36,7 +40,7 @@ GameMode gameMode;
 
 void Awake(){
     
-      levelUpater();
+         levelUpater();
 updateCurrentStartTop();
 }
 

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Unity.Services.CloudSave;
 using Unity.Services.Core;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,19 +15,58 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
         [SerializeField]
         Text m_StatusText;
         [SerializeField]
-        Text m_ExceptionText;
+       
+        
+        public GameObject m_SignOut;
         [SerializeField]
-        GameObject m_SignOut;
-        [SerializeField]
-        Toggle m_PlayerAccountSignOut;
+       
 
         string m_ExternalIds;
+
+        public static int loadLevel;
 
         async void Awake()
         {
             await UnityServices.InitializeAsync();
-            PlayerAccountService.Instance.SignedIn += SignInWithUnity;
+            PlayerAccountService.Instance.SignedIn +=  SignInWithUnity;
+
+            if(AuthenticationService.Instance.SessionTokenExists){
+                await SignInAnonymouslyAsync();
+                SynchronizeHighScore();
+               
+            }
+
+
+         
         }
+async Task SignInAnonymouslyAsync()
+{
+    try
+    {
+
+        
+        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        Debug.Log("Sign in anonymously succeeded!");
+        
+        // Shows how to get the playerID
+        Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}"); 
+
+    }
+    catch (AuthenticationException ex)
+    {
+        // Compare error code to AuthenticationErrorCodes
+        // Notify the player with the proper error message
+        Debug.LogException(ex);
+    }
+    catch (RequestFailedException ex)
+    {
+        // Compare error code to CommonErrorCodes
+        // Notify the player with the proper error message
+        Debug.LogException(ex);
+     }
+     UpdateUI();
+}
+
 
         public async void StartSignInAsync()
         {
@@ -42,43 +83,18 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
             catch (RequestFailedException ex)
             {
                 Debug.LogException(ex);
-                SetException(ex);
-            }
-        }
-
-        private async void SignInCachedUserAsync()
-        {
-            if (!AuthenticationService.Instance.SessionTokenExists)
-            {
-                return;
-            }
-
-            try
-            {
-                await AuthenticationService.Instance.SignInAnonymouslyAsync();
-                Debug.Log("Sign in anonymously succeeded!");
-                Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}");
-            }
-            catch (AuthenticationException ex)
-            {
-                Debug.LogException(ex);
-            }
-            catch (RequestFailedException ex)
-            {
-                Debug.LogException(ex);
+           
             }
         }
 
         public void SignOut()
         {
             AuthenticationService.Instance.SignOut();
-
-            if (m_PlayerAccountSignOut.isOn)
-            {
+                AuthenticationService.Instance.ClearSessionToken();
                 PlayerAccountService.Instance.SignOut();
-            }
-            m_SignOut.SetActive(false);
-            UpdateUI();
+        
+
+           m_StatusText.text ="logged out";
         }
 
         public void OpenAccountPortal()
@@ -92,22 +108,20 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
             {
                 await AuthenticationService.Instance.SignInWithUnityAsync(PlayerAccountService.Instance.AccessToken);
                 m_ExternalIds = GetExternalIds(AuthenticationService.Instance.PlayerInfo);
-                UpdateUI();
+                
             }
             catch (RequestFailedException ex)
             {
                 Debug.LogException(ex);
-                SetException(ex);
+       
             }
+            UpdateUI();
         }
 
         void UpdateUI()
         {
             var statusBuilder = new StringBuilder();
-
-            statusBuilder.AppendLine($"Player Accounts State: <b>{(PlayerAccountService.Instance.IsSignedIn ? "Signed in" : "Signed out")}</b>");
-            statusBuilder.AppendLine($"Player Accounts Access token: <b>{(string.IsNullOrEmpty(PlayerAccountService.Instance.AccessToken) ? "Missing" : "Exists")}</b>\n");
-            statusBuilder.AppendLine($"Authentication Service State: <b>{(AuthenticationService.Instance.IsSignedIn ? "Signed in" : "Signed out")}</b>");
+         
 
             if (AuthenticationService.Instance.IsSignedIn)
             {
@@ -117,7 +131,7 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
             }
 
             m_StatusText.text = statusBuilder.ToString();
-            SetException(null);
+           
         }
 
         string GetExternalIds(PlayerInfo playerInfo)
@@ -141,20 +155,83 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
             return $"ExternalIds: <b>{m_ExternalIds}</b>";
         }
 
-        void SetException(Exception ex)
-        {
-            m_ExceptionText.text = ex != null ? $"{ex.GetType().Name}: {ex.Message}" : "";
-        }
-        async void SaveData()
+       public static async void SavePlayerData(string v, int currentLevel)
 {
     var data = new Dictionary<string, object>
     {
-        { "HighScore", 12345 }
+        { "HighScore", currentLevel }
     };
+
     await CloudSaveService.Instance.Data.ForceSaveAsync(data);
 }
-    }
 
+public static async Task  LoadPlayerData()
+{
+    var savedData = await CloudSaveService.Instance.Data.LoadAllAsync();
+
+    if (savedData.ContainsKey("HighScore"))
+    {
+        string highScoreString = savedData["HighScore"].ToString();
+        int loadLevel = int.Parse(highScoreString);
+
+        // Speichere den HighScore lokal
+        PlayerAccountsDemo.loadLevel = loadLevel; // Globale Variable
+        PlayerPrefs.SetInt("HighScore", loadLevel); // PlayerPrefs aktualisieren
+
+        Debug.Log("Loaded HighScore: " + loadLevel);
+    }else{
+        SavePlayerData("HighScore",PlayerPrefs.GetInt("HighScore",0));
+    }
+}
+
+
+public static async Task<bool> containsHighScoreAsync(){
+    var savedData = await CloudSaveService.Instance.Data.LoadAllAsync();
+    return savedData.ContainsKey("HighScore");
+}
+
+public static async Task UpdateHighScore(int newScore)
+{
+    var data = new Dictionary<string, object>
+    {
+        { "HighScore", newScore }
+    };
+
+    await CloudSaveService.Instance.Data.ForceSaveAsync(data);
+
+    Debug.Log("HighScore updated to: " + newScore);
+}
+
+public static async void SynchronizeHighScore()
+{
+    // Lade Cloud-Daten
+    await LoadPlayerData();
+
+    // Lokalen HighScore abrufen
+    int localHighScore = PlayerPrefs.GetInt("HighScore");
+
+    // Synchronisation zwischen Cloud und Lokal
+    if (PlayerAccountsDemo.loadLevel > localHighScore)
+    {
+        PlayerPrefs.SetInt("HighScore", PlayerAccountsDemo.loadLevel);
+        Debug.Log("Local HighScore updated to: " + PlayerAccountsDemo.loadLevel);
+    }
+    else if (localHighScore > PlayerAccountsDemo.loadLevel)
+    {
+        await UpdateHighScore(localHighScore);
+        Debug.Log("Cloud HighScore updated to: " + localHighScore);
+    }
+}
+
+
+    }
+    
 
     
+
+    
+    
 }
+
+
+

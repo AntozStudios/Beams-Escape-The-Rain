@@ -109,7 +109,7 @@ bannerID="ca-app-pub-1320039869895590/6775514145";
         _rewardedInitAd = null;
     }
 
-    Debug.Log("Lade neue Rewarded-Interstitial-Anzeige...");
+   // Debug.Log("Lade neue Rewarded-Interstitial-Anzeige...");
 
     var adRequest = new AdRequest();
 
@@ -118,11 +118,11 @@ bannerID="ca-app-pub-1320039869895590/6775514145";
         {
             if (error != null || ad == null)
             {
-                Debug.LogError("Anzeige konnte nicht geladen werden: " + error);
+            //    Debug.LogError("Anzeige konnte nicht geladen werden: " + error);
                 return;
             }
 
-            Debug.Log("Anzeige erfolgreich geladen.");
+       //     Debug.Log("Anzeige erfolgreich geladen.");
             _rewardedInitAd = ad;
 
             // Registriere Events
@@ -142,7 +142,7 @@ public void ShowRewardedInterstitialAd()
     {
         _rewardedInitAd.Show((Reward reward) =>
         {
-            Debug.Log($"Belohnung erhalten: {reward.Type}, Menge: {reward.Amount}");
+         //   Debug.Log($"Belohnung erhalten: {reward.Type}, Menge: {reward.Amount}");
             // Belohnungslogik hier
             player.GetComponent<PlayerCollision>().amountLife += (int)reward.Amount;
             player.GetComponent<PlayerCollision>().revivePlayer();

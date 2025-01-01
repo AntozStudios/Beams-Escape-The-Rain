@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
+using Unity.Services.Authentication.PlayerAccounts.Samples;
+using Unity.Services.CloudSave;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -18,10 +21,13 @@ public class PlayerCollision : MonoBehaviour
    [SerializeField] GameManager gameManager;
   
   
-   
-   
-   
-   
+  
+
+ void Start(){
+
+
+  
+ }
 
 GameObject glowParent;
 GameObject glowChild;
@@ -47,6 +53,8 @@ amountLife--;
 soundManager.playSoundOneShot(SoundManager.SoundType.player,"hissing");
 if(amountLife==0){
  loose();
+ 
+
 }
 }
 }
@@ -106,20 +114,9 @@ public void loose(){
   gameManager.showDeathPanel();
   levelCounter.gameObject.SetActive(false);
 
-if(PlayerPrefs.GetInt("HighScore")==0){
-if(levelManager.currentLevel>0){
-  PlayerPrefs.SetInt("HighScore",levelManager.currentLevel);
-
-}
-}else{
-  if(levelManager.currentLevel>PlayerPrefs.GetInt("HighScore")){
-  PlayerPrefs.SetInt("HighScore",levelManager.currentLevel);
-  }
-}
- 
-
 
   
+
 }
 
 public void revivePlayer(){
@@ -133,4 +130,12 @@ levelCounter.gameObject.SetActive(true);
 
 }
 
+
+
+
+
+
+
+
 }
+
