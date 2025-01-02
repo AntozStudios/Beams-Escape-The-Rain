@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using System.Threading.Tasks;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -255,14 +256,15 @@ public void resetMovementCounters(){
 
 private void hideGameObjects( bool value){
     foreach(GameObject g in hideObjectWhenGameStarts){
-        g.SetActive(value);
+        if(g!=null) g.SetActive(value);
     }
 }
 public void startGame(){
     levelManager.gameStarted = true;
-    canMove = true;
+    
 
 }
+
 
 
     }

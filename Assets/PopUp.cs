@@ -6,50 +6,38 @@ using UnityEngine.UI;
 
 public class PopUp : MonoBehaviour
 {
-    
     [SerializeField] Button exitButton;
 
-    [HideInInspector]public TMP_Text text;
+    public TMP_Text text;
 
-    [SerializeField] bool destroyObject;
 
-      GameObject player;
+    private Animator animator;
+
+
+
     
-void Awake(){
-   player = GameObject.FindWithTag("Player").gameObject;
-   if(destroyObject){
-player.GetComponent<PlayerMovement>().canMove = false;
+    void Awake(){
+      animator = GetComponentInChildren<Animator>();
+     
+    }
+public void showPopUp(){
+  animator.SetTrigger("start");
+  
+}
+   
+public void hidePopUp(){
+
+  animator.SetTrigger("hide");
+
+  
+}
+   void Update(){
    }
-   
-   
-}
-
-
-void OnDestroy(){
-    if(destroyObject && player!=null){
-
-player.GetComponent<PlayerMovement>().canMove = true;
-    }
-
-}
-
-
-    public void DestroyPopUp(){
-        
-      GetComponentInChildren<Animator>().SetTrigger("hide");
-      
-       
-        
-    }
-
-    void Update(){
-{
-  }
 
     
-    }
 
-    public void show(){
-        GetComponentInChildren<Animator>().SetTrigger("start");
-    }
+
+
+
+
 }

@@ -6,7 +6,8 @@ using UnityEngine.UI;
 
 public class CreatePopUp : MonoBehaviour
 {
-    [SerializeField] GameObject prefab;
+    public GameObject prefab;
+    [SerializeField] Transform popUpManager;
     
 
   public int index;
@@ -42,13 +43,13 @@ if(GameObject.Find(prefab.name)!=null){
     }
      public void ClickCreatePopUp(){
         if(thisGameobject==null){
-thisGameobject = Instantiate(prefab);
+thisGameobject = Instantiate(prefab,popUpManager);
 if(text.Length>0){
 thisGameobject.GetComponent<PopUp>().text.text =text;
 }
 
         }else{
-          thisGameobject.GetComponentInChildren<PopUp>().show();
+          showPopUp();
         }
         
     }
@@ -56,7 +57,9 @@ thisGameobject.GetComponent<PopUp>().text.text =text;
   
 
    public void showPopUp(){
-    thisGameobject.GetComponent<PopUp>().show();
+     
+        thisGameobject.GetComponent<PopUp>().showPopUp();
+
    }
 
    

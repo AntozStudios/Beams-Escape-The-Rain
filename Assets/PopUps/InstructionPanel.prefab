@@ -262,7 +262,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 418610909118233690}
         m_TargetAssemblyTypeName: PopUp, Assembly-CSharp
-        m_MethodName: DestroyPopUp
+        m_MethodName: hidePopUp
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -104,7 +104,7 @@ if(glowChild.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Glo
 }
   
 
-public void loose(){
+public async void loose(){
   GameObject temp = transform.Find("PlayerHit_ParticleSystem").gameObject;
   soundManager.playSoundOneShot(SoundManager.SoundType.player,"explosion");
   temp.GetComponent<ParticleSystem>().Play();
@@ -114,8 +114,7 @@ public void loose(){
   gameManager.showDeathPanel();
   levelCounter.gameObject.SetActive(false);
 
-
-  
+checkHighScore();
 
 }
 
@@ -128,6 +127,10 @@ GameObject temp = deathParent.Find("PlayerHit_ParticleSystem").gameObject;
 gameManager.hideDeathPanel();
 levelCounter.gameObject.SetActive(true);
 
+}
+public async void checkHighScore()
+{
+    
 }
 
 
