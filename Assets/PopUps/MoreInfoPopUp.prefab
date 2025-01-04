@@ -257,7 +257,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4712680114574256417}
+      - m_Target: {fileID: -8122798989517780856}
         m_TargetAssemblyTypeName: LinkContainer, Assembly-CSharp
         m_MethodName: OpenLink
         m_Mode: 5
@@ -526,7 +526,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4712680114574256417}
+      - m_Target: {fileID: -8122798989517780856}
         m_TargetAssemblyTypeName: LinkContainer, Assembly-CSharp
         m_MethodName: OpenLink
         m_Mode: 5
@@ -661,7 +661,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 418610909118233690}
         m_TargetAssemblyTypeName: PopUp, Assembly-CSharp
-        m_MethodName: DestroyPopUp
+        m_MethodName: hidePopUp
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1445,7 +1445,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4712680114574256417}
+      - m_Target: {fileID: -8122798989517780856}
         m_TargetAssemblyTypeName: LinkContainer, Assembly-CSharp
         m_MethodName: OpenLink
         m_Mode: 5
@@ -1578,17 +1578,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Unity.Services.Authentication.PlayerAccounts.Samples.PlayerAccountsDemo,
-          Assembly-CSharp
-        m_MethodName: StartSignInAsync
-        m_Mode: 1
+      - m_Target: {fileID: -8122798989517780856}
+        m_TargetAssemblyTypeName: LinkContainer, Assembly-CSharp
+        m_MethodName: OpenLink
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: https://player-account.unity.com/
           m_BoolArgument: 0
         m_CallState: 1
 --- !u!1 &8400566268053541853
@@ -1740,7 +1739,7 @@ GameObject:
   - component: {fileID: 8782811029960480597}
   - component: {fileID: 5279155313857729366}
   - component: {fileID: 418610909118233690}
-  - component: {fileID: 4712680114574256417}
+  - component: {fileID: -8122798989517780856}
   m_Layer: 5
   m_Name: MoreInfoPopUp
   m_TagString: PopUp
@@ -1843,10 +1842,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8903e6921d0314449df6c19b407fbc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  exitButton: {fileID: 684126454168600445}
   text: {fileID: 0}
-  destroyObject: 1
---- !u!114 &4712680114574256417
+--- !u!114 &-8122798989517780856
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1861,6 +1858,8 @@ MonoBehaviour:
   linkToTermsOfService: https://github.com/AntozStudios/Beams.terms.of.service.io
   linkToPolicy: https://github.com/AntozStudios/Beams.privacy.policy.io
   linkToPolicyOfUnity: https://unity.com/legal/privacy-policy
+  playStoreLink: https://play.google.com/store/apps/details?id=com.AntozStudios.BeamsEscapeTheRain&hl=de
+  unityPortalLink: https://player-account.unity.com/
 --- !u!1 &9001947705967469852
 GameObject:
   m_ObjectHideFlags: 0
@@ -1874,7 +1873,7 @@ GameObject:
   - component: {fileID: 6407490179035288291}
   - component: {fileID: 8748043604592481478}
   m_Layer: 5
-  m_Name: SignInButton (3)
+  m_Name: UnityPrivacyPolicy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1982,7 +1981,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4712680114574256417}
+      - m_Target: {fileID: -8122798989517780856}
         m_TargetAssemblyTypeName: LinkContainer, Assembly-CSharp
         m_MethodName: OpenLink
         m_Mode: 5

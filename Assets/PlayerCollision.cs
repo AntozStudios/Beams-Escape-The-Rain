@@ -19,6 +19,7 @@ public class PlayerCollision : MonoBehaviour
    [SerializeField] Transform deathParent;
    [SerializeField] SoundManager soundManager;
    [SerializeField] GameManager gameManager;
+   [SerializeField] PlayerAccountsDemo playerAccountsDemo;
   
   
   
@@ -114,8 +115,15 @@ public async void loose(){
   gameManager.showDeathPanel();
   levelCounter.gameObject.SetActive(false);
 
-checkHighScore();
 
+
+       if(levelManager.currentLevel>PlayerPrefs.GetInt("HighScore")){
+    PlayerPrefs.SetInt("HighScore",levelManager.currentLevel);
+    if(PlayerPrefs.GetString("PlayMode").Equals("Cloud")){
+      await playerAccountsDemo.UpdateHighScoreAsync(levelManager.currentLevel);
+    }
+    
+  }
 }
 
 public void revivePlayer(){
@@ -128,10 +136,7 @@ gameManager.hideDeathPanel();
 levelCounter.gameObject.SetActive(true);
 
 }
-public async void checkHighScore()
-{
-    
-}
+
 
 
 

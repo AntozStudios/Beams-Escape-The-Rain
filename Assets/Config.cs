@@ -1,15 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public class Config : MonoBehaviour
 {
     [SerializeField] GameObject player;
+    [SerializeField] bool testingDeleteSavedKeys;
+    [SerializeField] ArchivementManager archivementManager;
+    
     
     // Start is called before the first frame update
    void Awake(){
-    ArchivementManager.ApplySavedItems(player);
+  
+archivementManager.ApplySavedItems();
+ 
+   
+   
     Application.targetFrameRate = (int)Screen.currentResolution.refreshRateRatio.value;
+    if(testingDeleteSavedKeys){
+        PlayerPrefs.DeleteAll();
+
+    }
    }
    void Start(){
 

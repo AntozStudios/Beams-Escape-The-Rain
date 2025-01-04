@@ -1,8 +1,4 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
 
 public class PlayerChildren : MonoBehaviour
 {
@@ -16,6 +12,7 @@ public class PlayerChildren : MonoBehaviour
 
     void Awake()
     {
+           
         playerRenderer = GetComponent<Renderer>();
 
         playerLight.color = playerRenderer.material.color;

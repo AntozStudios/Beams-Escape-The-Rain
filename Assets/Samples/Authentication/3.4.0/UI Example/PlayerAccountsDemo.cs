@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
 using TMPro;
 using Unity.Services.CloudSave;
 using Unity.Services.Core;
@@ -13,55 +14,46 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
 {
     class PlayerAccountsDemo : MonoBehaviour
     {
-        [SerializeField] GameObject overwritePanel;
-        bool areYouSure;
-        
         [SerializeField] TMP_Text playerID;
-        [SerializeField] Button signButton, signOut;
-
-        public GameObject m_SignOut;
+        [SerializeField] Button signInButton, signOutButton;
 
         public static PlayerAccountsDemo Instance;
 
         string m_ExternalIds;
-
         public int loadLevel;
 
-        GameObject temp;
+        [SerializeField] ArchivementManager archivementManager;
 
         async void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else if (Instance != this)
-            {
-                Destroy(this);
-                return;
-            }
-
             await UnityServices.InitializeAsync();
+
             PlayerAccountService.Instance.SignedIn += SignInWithUnity;
 
             if (AuthenticationService.Instance.SessionTokenExists)
             {
-                await SignInAnonymouslyAsync();
-                
-                if (!string.IsNullOrEmpty(PlayerPrefs.GetString("LastPlayerID")) &&
-                    !string.IsNullOrEmpty(PlayerPrefs.GetString("CurrentPlayerID")) &&
-                    !isSameUser())
+                Debug.Log("Session token exists, checking sign-in status...");
+                if (!PlayerAccountService.Instance.IsSignedIn)
                 {
-                    Debug.Log("Lokale Punkte werden auf 0 gesetzt, weil du dich mit einem anderen Konto angemeldet hast.");
-                    PlayerPrefs.SetInt("HighScore", 0);
+                    await SignInAnonymouslyAsync();
                 }
-
-                await SynchronizeHighScoreAsync();
-                PlayerPrefs.SetString("CurrentAccessToken", AuthenticationService.Instance.PlayerId);
-                signButton.gameObject.SetActive(false);
+                else
+                {
+                    SignInWithUnity(); // Direkter Aufruf, um den Status und die UI zu aktualisieren
+                }
             }
+            else
+            {
+                // Kein aktiver Login-Status
+                signInButton.interactable = true;
+                signOutButton.interactable = false;
+                Debug.Log("No session token exists.");
+            }
+        }
 
+        void Update()
+        {
+            // UI nur aktualisieren, wenn sich der Login-Status geändert hat
             UpdateUI();
         }
 
@@ -71,13 +63,15 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
             {
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
                 Debug.Log("Sign in anonymously succeeded!");
+                
             }
             catch (RequestFailedException ex)
             {
-                Debug.LogException(ex);
+                Debug.LogError($"Anonymous sign-in failed: {ex.Message}");
             }
         }
 
+        // Seite wird gestartet
         public async void StartSignInAsync()
         {
             if (PlayerAccountService.Instance.IsSignedIn)
@@ -89,25 +83,24 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
             try
             {
                 await PlayerAccountService.Instance.StartSignInAsync();
+                Debug.Log("Sign-in initiated successfully");
             }
             catch (RequestFailedException ex)
             {
-                Debug.LogException(ex);
+                Debug.LogError($"Sign-in failed: {ex.Message}");
             }
         }
 
         public void SignOut()
         {
-            AuthenticationService.Instance.SignOut();
-            AuthenticationService.Instance.ClearSessionToken();
             PlayerAccountService.Instance.SignOut();
-
-            PlayerPrefs.SetString("OverWrite", "");
-            PlayerPrefs.SetString("LastPlayerID", PlayerPrefs.GetString("CurrentPlayerID"));
-            PlayerPrefs.SetString("CurrentPlayerID", string.Empty);
+            AuthenticationService.Instance.SignOut(true);
+            AuthenticationService.Instance.ClearSessionToken();
 
             playerID.text = "logged out";
-            UpdateUI();
+            PlayerPrefs.SetString("PlayMode", "Local");
+
+            archivementManager.ResetSavedItems();
         }
 
         async void SignInWithUnity()
@@ -118,50 +111,32 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
                 m_ExternalIds = GetExternalIds(AuthenticationService.Instance.PlayerInfo);
 
                 PlayerPrefs.SetString("CurrentPlayerID", AuthenticationService.Instance.PlayerId);
-                if (!isSameUser())
-                {
-                    Debug.Log("Lokale Punkte werden auf 0 gesetzt, weil du dich mit einem anderen Konto angemeldet hast.");
-                    PlayerPrefs.SetInt("HighScore", 0);
-                }
+                Debug.Log("CurrentPlayerID: " + PlayerPrefs.GetString("CurrentPlayerID"));
+               
 
-                await SynchronizeHighScoreAsync();
+archivementManager.initAllItems();
+                await SynchronizeHighScoreAsync();  // Synchronisiere den Highscore nach der Anmeldung
             }
             catch (AuthenticationException ex)
             {
-                Debug.LogException(ex);
+                Debug.Log(ex.ErrorCode);
             }
-
-            UpdateUI();
-        }
-
-        bool isSameUser()
-        {
-            string lastPlayerId = PlayerPrefs.GetString("LastPlayerID");
-            string currentPlayerId = PlayerPrefs.GetString("CurrentPlayerID");
-            return !string.IsNullOrEmpty(lastPlayerId) && lastPlayerId.Equals(currentPlayerId);
         }
 
         void UpdateUI()
         {
-            var statusBuilder = new StringBuilder();
-
             if (AuthenticationService.Instance.IsSignedIn)
             {
-                m_SignOut.SetActive(true);
-                statusBuilder.AppendLine(GetPlayerInfoText());
-                statusBuilder.AppendLine($"PlayerId: <b>{AuthenticationService.Instance.PlayerId}</b>");
-                signOut.gameObject.SetActive(true);
-                signButton.gameObject.SetActive(false);
-                PlayerPrefs.SetString("PlayMode", "Cloud");
+                signInButton.interactable = false;
+                signOutButton.interactable = true;
+                playerID.text = $"PlayerId: <b>{AuthenticationService.Instance.PlayerId}</b>";
             }
             else
             {
-                signButton.gameObject.SetActive(true);
-                signOut.gameObject.SetActive(false);
-                PlayerPrefs.SetString("PlayMode", "Local");
+                signInButton.interactable = true;
+                signOutButton.interactable = false;
+                playerID.text = "logged out";
             }
-
-            playerID.text = statusBuilder.ToString();
         }
 
         string GetExternalIds(PlayerInfo playerInfo)
@@ -188,66 +163,18 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
         public async Task SynchronizeHighScoreAsync()
         {
             await LoadPlayerDataAsync();
+            PlayerPrefs.SetString("PlayMode", "Cloud");
 
             int localHighScore = PlayerPrefs.GetInt("HighScore");
-            // Lokale Punktzahl ist hoeher als  Cloud und das ist der selbe Spieleraccount
-            if (loadLevel > localHighScore && !PlayerPrefs.GetString("OverWrite").Equals( "Asked") && isSameUser() )
+
+            if (localHighScore > loadLevel)
             {
-                temp = Instantiate(overwritePanel);
-                temp.GetComponent<PopUp>().text.text = $"Profile level HighScore is: {loadLevel}, Your current HighScore is {localHighScore}";
-                temp.GetComponentInChildren<Animator>().SetTrigger("start");
-
-                temp.GetComponent<YesNoConfig>().yes.onClick.AddListener(async () =>
-                {
-                    temp.GetComponent<PopUp>().text.text="Are you sure?";
-                    temp.GetComponent<YesNoConfig>().yes.onClick.RemoveAllListeners();
-                  temp.GetComponent<YesNoConfig>().yes.onClick.AddListener(()=>areYouSureMethod());
-                });
-          
-        
-
-                temp.GetComponent<YesNoConfig>().no.onClick.AddListener(() =>
-                {
-                    PlayerPrefs.SetInt("HighScore", loadLevel);
-                    PlayerPrefs.SetString("OverWrite", "Asked");
-                    Destroy(temp);
-                });
-
-            // Spieleraccount wurde gewechselt und Spieleraccount existiert, ist nicht gleich wie der vorherige
-            }else if (localHighScore > 0 && !PlayerPrefs.GetString("OverWrite").Equals( "Asked")&& !isSameUser() )
-            {
-                temp = Instantiate(overwritePanel);
-                temp.GetComponent<PopUp>().text.text = $"Profile with highscore {loadLevel} loaded!";
-                temp.GetComponentInChildren<Animator>().SetTrigger("start");
-
-                temp.GetComponent<YesNoConfig>().yes.onClick.AddListener(async () =>
-                {
-                    PlayerPrefs.SetInt("HighScore", loadLevel);
-                    PlayerPrefs.SetString("OverWrite", "Asked");
-                    Destroy(temp);
-                });
-          
-        
-
-                temp.GetComponent<YesNoConfig>().no.gameObject.SetActive(false);
-
-
+                await UpdateHighScoreAsync(localHighScore);
             }
-
-           
-            else if (loadLevel == 0)
+            else
             {
-                PlayerPrefs.SetInt("HighScore", localHighScore);
-                PlayerPrefs.SetString("OverWrite", "Asked");
+                PlayerPrefs.SetInt("HighScore", loadLevel);
             }
-           
-        }
-
-        private  async void areYouSureMethod(){
-            int localHighScore = PlayerPrefs.GetInt("HighScore");
-            await UpdateHighScoreAsync(localHighScore);
-                    PlayerPrefs.SetString("OverWrite", "Asked");
-                    Destroy(temp);
         }
 
         public async Task LoadPlayerDataAsync()
@@ -259,6 +186,7 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
                 string highScoreString = savedData["HighScore"].ToString();
                 loadLevel = int.Parse(highScoreString);
                 Debug.Log("Loaded HighScore: " + loadLevel);
+            
             }
             else
             {
@@ -285,6 +213,11 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
 
             await CloudSaveService.Instance.Data.ForceSaveAsync(data);
             Debug.Log("HighScore updated to: " + newScore);
+        }
+
+        private bool firstLogin()
+        {
+            return string.IsNullOrEmpty(PlayerPrefs.GetString("LastPlayerID"));
         }
     }
 }

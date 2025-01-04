@@ -33,12 +33,12 @@ public int currentLevel;
  Material sandMaterial,iceMaterial,grassMaterial;
 
 
-
 GameMode gameMode;
 [SerializeField]
 
 
 void Awake(){
+    
     
          levelUpater();
 updateCurrentStartTop();
@@ -80,7 +80,7 @@ displayAFKCounter();
     }   
 
 void checkGameModes(){
-      if(gameMode == GameMode.grassMode){
+      if(gameMode == GameMode.grassMode ){
             groundMaterial(grassMaterial);
         }else if(gameMode == GameMode.iceMode){
             groundMaterial(iceMaterial);
@@ -181,7 +181,7 @@ void groundMaterial(Material material){
     
 
 foreach(GameObject g in levelParts[levelParts.Count-1].GetComponent<LevelMaterial>().tops){
-
+    
 if(gameMode == GameMode.grassMode){
     g.GetComponent<Renderer>().material = grassMaterial;
 }else if(gameMode==GameMode.sandMode){
@@ -195,6 +195,9 @@ else if (gameMode == GameMode.iceMode){
 
     }
     
+    
+
+
 
 }
 }

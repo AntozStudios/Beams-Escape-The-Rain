@@ -20,7 +20,7 @@ public GameObject deathPanel;
 
 
 public void loadScene(string name){
-    SceneManager.LoadSceneAsync(name);
+    SceneManager.LoadScene(name);
 }
 
 

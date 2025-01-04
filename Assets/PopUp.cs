@@ -6,9 +6,9 @@ using UnityEngine.UI;
 
 public class PopUp : MonoBehaviour
 {
-    [SerializeField] Button exitButton;
+  
 
-    public TMP_Text text;
+   [HideInInspector] public TMP_Text text;
 
 
     private Animator animator;
@@ -32,6 +32,7 @@ public void hidePopUp(){
   
 }
    void Update(){
+    
    }
 
     

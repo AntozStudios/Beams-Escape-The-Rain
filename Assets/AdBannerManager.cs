@@ -6,14 +6,10 @@ public class AdBannerManager : MonoBehaviour
 {
     [SerializeField] AdManager adManager;
    
-   void Start(){
-
-
-
-
-LoadAd();
+  void Awake(){
+    LoadAd();
 ListenToAdEvents();
-   }
+  }
             void OnConsentInfoUpdated(FormError consentError)
 {
     if (consentError != null)

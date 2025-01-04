@@ -9,7 +9,10 @@ public class SwipeText : MonoBehaviour
     }
 
   void OnDestroy(){
-    Debug.Log(true);
-    player.GetComponent<PlayerMovement>().canMove = true;
+
+    if(player!=null){
+  player.GetComponent<PlayerMovement>().canMove = true;
+    }
+  
   }
 }

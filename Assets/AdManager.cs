@@ -1,14 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
 
-using TMPro;
-using GoogleMobileAds;
 using GoogleMobileAds.Api;
 using GoogleMobileAds.Ump.Api;
-using System;
-using UnityEngine.SceneManagement;
+
 
 
 
