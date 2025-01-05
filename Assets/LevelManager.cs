@@ -220,7 +220,7 @@ else if(currentMode.Equals(GameMode.sandMode.ToString())){
 
 void displayAFKCounter(){
     if(player.GetComponent<PlayerMovement>().startAFKTimer && player.GetComponent<PlayerMovement>().verticalMoves>=1){
-afkText.text = "Move or Die: "+(int)player.GetComponent<PlayerMovement>().startAfkCounter;
+afkText.text = "Move or Die: "+ Math.Round(player.GetComponent<PlayerMovement>().startAfkCounter,2);
 }else{
     afkText.text = "";
 }

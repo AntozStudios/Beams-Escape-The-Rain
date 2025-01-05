@@ -24,35 +24,34 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
 
         [SerializeField] ArchivementManager archivementManager;
 
-        async void Awake()
-        {
-            await UnityServices.InitializeAsync();
+      async void Awake()
+{
+    await UnityServices.InitializeAsync();
 
-            PlayerAccountService.Instance.SignedIn += SignInWithUnity;
+    PlayerAccountService.Instance.SignedIn += SignInWithUnity;
 
-            if (AuthenticationService.Instance.SessionTokenExists)
-            {
-                Debug.Log("Session token exists, checking sign-in status...");
-                if (!PlayerAccountService.Instance.IsSignedIn)
-                {
-                    await SignInAnonymouslyAsync();
-                }
-                else
-                {
-                    SignInWithUnity(); // Direkter Aufruf, um den Status und die UI zu aktualisieren
-                }
-            }
-            else
-            {
-                // Kein aktiver Login-Status
-                signInButton.interactable = true;
-                signOutButton.interactable = false;
-                Debug.Log("No session token exists.");
-            }
-        }
+    // Überprüfen, ob der Benutzer bereits angemeldet ist
+    if (AuthenticationService.Instance.IsSignedIn)
+    {
+        Debug.Log("User is already signed in.");
+        SignInWithUnity(); // Aktualisiere den Status und die UI
+    }
+    else if (AuthenticationService.Instance.SessionTokenExists)
+    {
+        Debug.Log("Session token exists, signing in anonymously.");
+        await SignInAnonymouslyAsync();
+    }
+    else
+    {
+        Debug.Log("No session token, user is not signed in.");
+        UpdateUI();
+    }
+}
+
 
         void Update()
         {
+            
             // UI nur aktualisieren, wenn sich der Login-Status geändert hat
             UpdateUI();
         }
@@ -96,9 +95,11 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
             PlayerAccountService.Instance.SignOut();
             AuthenticationService.Instance.SignOut(true);
             AuthenticationService.Instance.ClearSessionToken();
+            
 
             playerID.text = "logged out";
             PlayerPrefs.SetString("PlayMode", "Local");
+            PlayerPrefs.SetInt("HighScore",0);
 
             archivementManager.ResetSavedItems();
         }
@@ -110,16 +111,14 @@ namespace Unity.Services.Authentication.PlayerAccounts.Samples
                 await AuthenticationService.Instance.SignInWithUnityAsync(PlayerAccountService.Instance.AccessToken);
                 m_ExternalIds = GetExternalIds(AuthenticationService.Instance.PlayerInfo);
 
-                PlayerPrefs.SetString("CurrentPlayerID", AuthenticationService.Instance.PlayerId);
-                Debug.Log("CurrentPlayerID: " + PlayerPrefs.GetString("CurrentPlayerID"));
                
-
-archivementManager.initAllItems();
+            
                 await SynchronizeHighScoreAsync();  // Synchronisiere den Highscore nach der Anmeldung
             }
             catch (AuthenticationException ex)
             {
-                Debug.Log(ex.ErrorCode);
+               Debug.Log($"Authentication failed with code: {ex.ErrorCode}, message: {ex.Message}");
+
             }
         }
 
@@ -155,25 +154,26 @@ archivementManager.initAllItems();
             return sb.ToString();
         }
 
-        string GetPlayerInfoText()
-        {
-            return $"ExternalIds: <b>{m_ExternalIds}</b>";
-        }
+        
 
         public async Task SynchronizeHighScoreAsync()
         {
             await LoadPlayerDataAsync();
+            
             PlayerPrefs.SetString("PlayMode", "Cloud");
 
             int localHighScore = PlayerPrefs.GetInt("HighScore");
+            Debug.Log(localHighScore);
 
             if (localHighScore > loadLevel)
             {
                 await UpdateHighScoreAsync(localHighScore);
+                Debug.Log("Highscore updated, Local Highscore was higher");
             }
             else
             {
                 PlayerPrefs.SetInt("HighScore", loadLevel);
+                Debug.Log("Highscore updated, Cload Highscore was higher");
             }
         }
 

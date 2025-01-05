@@ -1,5 +1,5 @@
 # ninja log v5
-428	791	7573182019867092	C:/Users/matte/Documents/GitHub/Beams-Escape-The-Rain/Library/PramData/AndroidApplicationController/Cache/com.AntozStudios.BeamsEscapeTheRain/gradle-project/unityLibrary/build/intermediates/cxx/Debug/206m5ra3/obj/arm64-v8a/libswappywrapper.so	c09e88204e0a27c1
-1	426	7573182017042500	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	5e13eb31ab5b242d
 12	899	7575959397041718	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	5e13eb31ab5b242d
 899	2140	7575959409038697	C:/Users/matte/Documents/GitHub/Beams-Escape-The-Rain/Library/PramData/AndroidApplicationController/Cache/com.AntozStudios.BeamsEscapeTheRain/gradle-project/unityLibrary/build/intermediates/cxx/Debug/206m5ra3/obj/arm64-v8a/libswappywrapper.so	c09e88204e0a27c1
+6	556	7577606245942252	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	5e13eb31ab5b242d
+557	1432	7577606254048362	C:/Users/matte/Documents/GitHub/Beams-Escape-The-Rain/Library/PramData/AndroidApplicationController/Cache/com.AntozStudios.BeamsEscapeTheRain/gradle-project/unityLibrary/build/intermediates/cxx/Debug/206m5ra3/obj/arm64-v8a/libswappywrapper.so	c09e88204e0a27c1
