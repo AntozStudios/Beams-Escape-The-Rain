@@ -20,7 +20,7 @@ public class PlayerCollision : MonoBehaviour
    [SerializeField] SoundManager soundManager;
    [SerializeField] GameManager gameManager;
    [SerializeField] PlayerAccountsDemo playerAccountsDemo;
-  
+   
   
   
 
@@ -114,7 +114,7 @@ public async void loose(){
   gameObject.SetActive(false);
   gameManager.showDeathPanel();
   levelCounter.gameObject.SetActive(false);
-
+  amountLife =0;
 
 
        if(levelManager.currentLevel>PlayerPrefs.GetInt("HighScore")){
@@ -124,6 +124,8 @@ public async void loose(){
     }
     
   }
+
+
 }
 
 public void revivePlayer(){
@@ -134,6 +136,7 @@ GameObject temp = deathParent.Find("PlayerHit_ParticleSystem").gameObject;
   GetComponent<PlayerMovement>().resetMovementCounters();  
 gameManager.hideDeathPanel();
 levelCounter.gameObject.SetActive(true);
+
 
 }
 

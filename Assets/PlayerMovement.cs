@@ -31,7 +31,7 @@ public float timeToMoveMax;
 
 
 [HideInInspector]public float startAfkCounter;
-[HideInInspector]public float startAfkMax;
+[HideInInspector]public float startAfkMax ;
 
 public bool playerHasToMove;
 
@@ -216,21 +216,23 @@ updatePlayerHasToMove();
 
 
 public void timeToMoveCountdown(){
-    if(timeToMoveCounter>timeToMoveMax){
+    timeToMoveCounter+=Time.deltaTime;
+    if(timeToMoveCounter>=timeToMoveMax){
     startAFKTimer = true;
     }else{
         startAFKTimer = false;
     }
-    timeToMoveCounter+=Time.deltaTime;
+    
     
 }
 
 public void afkCountdown(){
+    startAfkCounter-=Time.deltaTime;
     if(startAFKTimer){
     if(startAfkCounter<=0){
         GetComponent<PlayerCollision>().loose();
     }
-     startAfkCounter-=Time.deltaTime;
+     
 }else{
     startAfkCounter = startAfkMax;
 }

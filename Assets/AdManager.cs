@@ -25,6 +25,7 @@ public class AdManager : MonoBehaviour
   [SerializeField] bool isTesting;
   private const int MAX_ADS = 3;
  
+ private PlayerCollision playerCollision;
  
 
 
@@ -43,6 +44,7 @@ public class AdManager : MonoBehaviour
   private RewardedInterstitialAd  _rewardedInitAd;
     public void Awake()
     {
+        playerCollision = player.GetComponent<PlayerCollision>();
 
       // Create a ConsentRequestParameters object.
     ConsentRequestParameters request = new ConsentRequestParameters();
@@ -156,7 +158,7 @@ public void ShowRewardedInterstitialAd()
 
 
 public void Update(){
-    adButton.gameObject.SetActive(adUsed<MAX_ADS);
+    adButton.gameObject.SetActive(playerCollision.amountLife<1 && adUsed<MAX_ADS);
  
 
 }
