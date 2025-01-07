@@ -224,6 +224,8 @@ void displayAFKCounter(){
     if(player.GetComponent<PlayerMovement>().startAFKTimer && player.GetComponent<PlayerMovement>().verticalMoves>=1){
 afkText.text = "Move or Die: " + player.GetComponent<PlayerMovement>().startAfkCounter.ToString("F1");
 
+}else{
+  afkText.text="";
 }
 }
 
