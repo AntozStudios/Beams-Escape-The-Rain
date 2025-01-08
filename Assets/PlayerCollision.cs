@@ -110,7 +110,6 @@ public async void loose(){
   soundManager.playSoundOneShot(SoundManager.SoundType.player,"explosion");
   temp.GetComponent<ParticleSystem>().Play();
   temp.transform.SetParent(deathParent);
-  Camera.main.transform.SetParent(deathParent);
   gameObject.SetActive(false);
   gameManager.showDeathPanel();
   levelCounter.gameObject.SetActive(false);
@@ -128,15 +127,14 @@ public async void loose(){
 
 }
 
-public void revivePlayer(){
+public void revivePlayerSingleplayer(){
 GameObject temp = deathParent.Find("PlayerHit_ParticleSystem").gameObject;
   temp.transform.SetParent(gameObject.transform);
-  Camera.main.transform.SetParent(gameObject.transform);
   gameObject.SetActive(true);
   GetComponent<PlayerMovement>().resetMovementCounters();  
 gameManager.hideDeathPanel();
 levelCounter.gameObject.SetActive(true);
-
+levelManager.setPlayerToStartTop();
 
 }
 

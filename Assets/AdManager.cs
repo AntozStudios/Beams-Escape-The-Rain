@@ -143,8 +143,7 @@ public void ShowRewardedInterstitialAd()
          //   Debug.Log($"Belohnung erhalten: {reward.Type}, Menge: {reward.Amount}");
             // Belohnungslogik hier
             player.GetComponent<PlayerCollision>().amountLife += (int)reward.Amount;
-            player.GetComponent<PlayerCollision>().revivePlayer();
-            levelManager.setPlayerToStartTop();
+            player.GetComponent<PlayerCollision>().revivePlayerSingleplayer();
             adUsed++;
             deathPanel.GetComponent<AdBannerManager>().DestroyAd();
         });
