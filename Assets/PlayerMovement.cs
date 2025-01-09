@@ -1,7 +1,10 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
-using System.Threading.Tasks;
+using System.Numerics;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
+using Quaternion = UnityEngine.Quaternion;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -37,9 +40,9 @@ public bool playerHasToMove;
 
 
 public bool startAFKTimer;
+    public float speed;
 
-
-void Awake(){
+    void Awake(){
     startAfkCounter = startAfkMax;
    
 }
@@ -88,7 +91,8 @@ updatePlayerHasToMove();
         {
             if (horizontalMoves > -3)
             {
-                MovePlayer(Vector3.left);
+               // MovePlayer(Vector3.left);
+                 StartCoroutine(Roll(Vector3.left));
                   timeToMoveCounter =0;
                 horizontalMoves--;
             }
@@ -97,7 +101,8 @@ updatePlayerHasToMove();
         {
             if (horizontalMoves <= 2)
             {
-                MovePlayer(Vector3.right);
+               // MovePlayer(Vector3.right);
+                 StartCoroutine(Roll(Vector3.right));
                timeToMoveCounter =0;
                 horizontalMoves++;
             }
@@ -106,7 +111,8 @@ updatePlayerHasToMove();
         {
             if (verticalMoves <= 6)
             {
-                MovePlayer(Vector3.forward);
+               // MovePlayer(Vector3.forward);
+                 StartCoroutine(Roll(Vector3.forward));
                  timeToMoveCounter =0;
                 verticalMoves += 1;
             }
@@ -115,7 +121,8 @@ updatePlayerHasToMove();
         {
             if (verticalMoves > 0)
             {
-                MovePlayer(Vector3.back);
+               // MovePlayer(Vector3.back);
+                 StartCoroutine(Roll(Vector3.back));
                    timeToMoveCounter =0;
                 verticalMoves -= 1;
             }
@@ -162,7 +169,8 @@ updatePlayerHasToMove();
                 {
                     if (horizontalMoves <= 2)
                     {
-                        MovePlayer(Vector3.right);
+                    //    MovePlayer(Vector3.right);
+                    StartCoroutine(Roll(Vector3.right));
                          timeToMoveCounter =0;
                         horizontalMoves++;
                     }
@@ -171,7 +179,8 @@ updatePlayerHasToMove();
                 {
                     if (horizontalMoves > -3)
                     {
-                        MovePlayer(Vector3.left);
+                     //   MovePlayer(Vector3.left);
+                      StartCoroutine(Roll(Vector3.left));
                           timeToMoveCounter =0;
                         horizontalMoves--;
                     }
@@ -184,7 +193,8 @@ updatePlayerHasToMove();
                 {
                     if (verticalMoves <= 6)
                     {
-                        MovePlayer(Vector3.forward);
+                   //     MovePlayer(Vector3.forward);
+                    StartCoroutine(Roll(Vector3.forward));
                       timeToMoveCounter =0;
                         verticalMoves++;
                     }
@@ -193,7 +203,8 @@ updatePlayerHasToMove();
                 {
                     if (verticalMoves > 0)
                     {
-                        MovePlayer(Vector3.back);
+                 //       MovePlayer(Vector3.back);
+                  StartCoroutine(Roll(Vector3.back));
                    timeToMoveCounter =0;
                         verticalMoves--;
                     }
@@ -266,7 +277,24 @@ public void startGame(){
     
 
 }
+IEnumerator Roll(Vector3 direction){
+canMove = false;
+float remainingAngle = 90;
+Vector3 rotationCenter = transform.position + direction /2 + Vector3.down/2;
+Vector3 rotationAxis = Vector3.Cross(Vector3.up,direction);
 
+while(remainingAngle>0){
+    float rotationAngle = Mathf.Min(Time.deltaTime*speed,remainingAngle);
+    transform.RotateAround(rotationCenter,rotationAxis,rotationAngle);
+    remainingAngle-=rotationAngle;
+yield return null;
+}
+
+canMove = true;
+transform.rotation = Quaternion.identity;
+    
+
+}
 
 
     }

@@ -94,6 +94,7 @@ void updateIfPlayerCanMove(){
     if(glowParent!=null && glowChild!=null){
 if(glowChild.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("GlowEffectEnd")){
         GetComponent<PlayerMovement>().canMove = true;  
+          Destroy(glowChild);
   
     }else{
        GetComponent<PlayerMovement>().canMove = false;
@@ -102,6 +103,8 @@ if(glowChild.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("Glo
 
 
     }
+    
+  
 }
   
 

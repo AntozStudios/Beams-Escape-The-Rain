@@ -1,11 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using TMPro;
-using Unity.Services.Authentication.PlayerAccounts.Samples;
 using UnityEngine;
-
 public class LevelManager : MonoBehaviour
 {
 
@@ -152,8 +148,7 @@ void levelUpater(){
 
    int count = Enum.GetValues(typeof(GameMode)).Length;
    int randomMaterial = UnityEngine.Random.Range(0,count);
-   Debug.Log(randomMaterial);
-   Debug.Log(currentMode);
+   
    currentMode = Enum.GetName(typeof(GameMode),randomMaterial).ToString();
 
     levelSettings(5000,10000,(GameMode)randomMaterial,false);
@@ -185,14 +180,14 @@ void groundMaterial(Material material){
 foreach(GameObject g in levelParts[levelParts.Count-1].GetComponent<LevelMaterial>().tops){
     
 if(gameMode == GameMode.grassMode){
-    g.GetComponent<Renderer>().material = grassMaterial;
+    g.GetComponent<Renderer>().material = material;
 }else if(gameMode==GameMode.sandMode){
 
-g.GetComponent<Renderer>().material = sandMaterial;
+g.GetComponent<Renderer>().material = material;
 
 }
 else if (gameMode == GameMode.iceMode){
-    g.GetComponent<Renderer>().material = iceMaterial;
+    g.GetComponent<Renderer>().material = material;
 
 
     }

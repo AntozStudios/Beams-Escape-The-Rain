@@ -14,18 +14,9 @@ private LevelManager levelManager;
 
     private int groundedRainCounter;
     public GameObject[] rainDrops;
-    
-    
 
     public float height;
 
-
-
-
-  
-
-
-    
    [SerializeField] GameObject[] tops;
     
 
@@ -72,7 +63,6 @@ void Update(){
 checkGrounding();
 
 
-
 void checkGrounding(){
     for(int i =0;i<rainDrops.Length;i++){
     if(rainDrops[i].GetComponent<RainCollision>().isGrounding){
@@ -94,5 +84,7 @@ if(groundedRainCounter>=rainDrops.Length){
 
 }
 
+
 }
+
 }
