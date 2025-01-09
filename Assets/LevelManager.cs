@@ -108,7 +108,7 @@ nextLevelParent.transform.position = new Vector3(lastLevelParentChildren.transfo
 lastLevelParentChildren.transform.position.y,lastLevelParentChildren.transform.position.z+nextLevelParentChildren.transform.localScale.z);
 levelUpater();
 destroyLevelParts();
-
+checkRainfallForCurrentLevel();
    
 
  
@@ -133,6 +133,10 @@ public void destroyLevelParts()
 }
 
 
+public void checkRainfallForCurrentLevel(){
+    levelParts[levelParts.Count-2].GetComponent<RainSpawner>().stopAndDestroyRaindrops=true;
+
+}
 
 void levelUpater(){
     if(currentLevel>=0 && currentLevel<=25){
