@@ -278,6 +278,8 @@ public void startGame(){
 
 }
 IEnumerator Roll(Vector3 direction){
+       soundManager.playSoundOneShot(SoundManager.SoundType.player, "player");
+        levelManager.gameStarted = true;
 canMove = false;
 float remainingAngle = 90;
 Vector3 rotationCenter = transform.position + direction /2 + Vector3.down/2;

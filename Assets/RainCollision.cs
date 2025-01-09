@@ -9,10 +9,6 @@ public class RainCollision : MonoBehaviour
     
     public Vector3 initPos;
     [SerializeField] GameObject rainFallOutPrefab;
-    GameObject levelManager;
-
-    [SerializeField] GameObject cameraParent;
-
     
     public bool isGrounding;
     
@@ -30,13 +26,7 @@ void Start(){
     
        
 }
-    // Update is called once per frame
-    void Update()
-    {
-        
  
-        
-    }
 
     [System.Obsolete]
     void OnCollisionEnter(Collision collision)
@@ -52,10 +42,10 @@ void Start(){
             
           
             
-        }else if(collision.gameObject.tag.Equals("Player")){
+        }else if(collision.gameObject.tag.Contains("Player")){
            
              GameObject temp = collision.gameObject.transform.Find("RainHit_ParticleSystem").gameObject;
-            if(GetComponent<Renderer>().material.name.Contains("RedRain")){
+            if(GetComponent<Renderer>().material.name.Equals("RedRain")){
          
 
                 temp.GetComponent<ParticleSystem>().startColor = GetComponent<Renderer>().material.color; 
