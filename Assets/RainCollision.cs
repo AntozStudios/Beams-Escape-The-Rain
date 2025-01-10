@@ -14,7 +14,7 @@ public class RainCollision : MonoBehaviour
     
 
 void Awake(){
-  GetComponent<Rigidbody>().collisionDetectionMode = CollisionDetectionMode.Continuous;
+
 
 }
    
@@ -31,7 +31,7 @@ void Start(){
     [System.Obsolete]
     void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.tag.Equals("Ground")){
+        if(collision.gameObject.CompareTag("Ground")){
             GameObject tempFallOut = Instantiate(rainFallOutPrefab);
             tempFallOut.GetComponent<Renderer>().material = GetComponent<Renderer>().material;
             tempFallOut.transform.position = new Vector3(collision.transform.position.x
@@ -42,10 +42,10 @@ void Start(){
             
           
             
-        }else if(collision.gameObject.tag.Contains("Player")){
+        }else if(collision.gameObject.CompareTag("Player")){
            
              GameObject temp = collision.gameObject.transform.Find("RainHit_ParticleSystem").gameObject;
-            if(GetComponent<Renderer>().material.name.Equals("RedRain")){
+            if(GetComponent<Renderer>().material.name.Contains("RedRain")){
          
 
                 temp.GetComponent<ParticleSystem>().startColor = GetComponent<Renderer>().material.color; 
@@ -62,7 +62,13 @@ void Start(){
            
 
             
+        }else if (collision.gameObject.CompareTag("LevelParent")){
+
+           isGrounding = true;
+
         }
+
+
 
 
 
