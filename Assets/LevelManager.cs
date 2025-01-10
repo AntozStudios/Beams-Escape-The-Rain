@@ -132,15 +132,15 @@ public void destroyLevelParts()
 
 void levelUpater(){
     if(currentLevel>=0 && currentLevel<=25){
-       levelSettings(2000,8000,GameMode.grassMode,false);
+       levelSettings(2000,5000,GameMode.grassMode,false);
        currentMode = GameMode.grassMode.ToString();
     
     }else  if(currentLevel>25 && currentLevel<=50){
-        levelSettings(3000,9000,GameMode.iceMode,false);
+        levelSettings(3000,5000,GameMode.iceMode,false);
         currentMode = GameMode.iceMode.ToString();
     }
     else  if(currentLevel>50 && currentLevel<=100){
-        levelSettings(4000,10000,GameMode.sandMode,false);
+        levelSettings(4000,8000,GameMode.sandMode,false);
         currentMode = GameMode.sandMode.ToString();
     }
     else{
@@ -151,7 +151,7 @@ void levelUpater(){
    
    currentMode = Enum.GetName(typeof(GameMode),randomMaterial).ToString();
 
-    levelSettings(5000,10000,(GameMode)randomMaterial,false);
+    levelSettings(5000,8000,(GameMode)randomMaterial,false);
     }
     setAFKCounter();
     

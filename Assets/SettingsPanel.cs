@@ -35,6 +35,7 @@ followPlayer.followSpeed = followPlayerSlider.value;
         }else{
                    followPlayerToggle.isOn = false;
                    followPlayerSlider.value = tempPlayerSliderValue;
+                   followPlayer.followSpeed = followPlayerSlider.value;
         }
          followPlayerSlider.interactable = followPlayerToggle.isOn;
          followPlayer.doFollowPlayer = followPlayerToggle.isOn;
@@ -63,6 +64,9 @@ followPlayer.followSpeed = followPlayerSlider.value;
   followPlayerSlider.interactable = followPlayerToggle.isOn;
  followPlayer.doFollowPlayer = followPlayerToggle.isOn;
   PlayerPrefs.SetString("LastFollowPlayerIsOn",followPlayerToggle.isOn.ToString());
+  
+
+ 
     }
 
      void changedSliderFollowPlayer(){
