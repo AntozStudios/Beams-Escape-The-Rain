@@ -17,25 +17,38 @@ private LevelManager levelManager;
 
     public float height;
 
-   [SerializeField] GameObject[] tops;
+   public List<GameObject> tops;
+   public List<GameObject> tops_material;
+  
     
 
 void Awake(){
     levelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();   
-    rainDrops = new GameObject[tops.Length];
-    
+   
+
+
 
 }
   
     void Start()
     {
      
-     Random.InitState(levelManager.currentLevel);
+ 
+
+
+    rainDrops = new GameObject[tops.Count];
+
+    
+
+        Random.InitState(levelManager.currentLevel);
 
  
- for(int i =0;i<tops.Length;i++){
+ for(int i =0;i<tops.Count;i++){
     GameObject temp = Instantiate(rainPrefab,transform);
+
     rainDrops[i] = temp;
+   
+    
  rainDrops[i].GetComponent<Renderer>().material = rainDrops[i].GetComponent<RainBehaviour>().materials[rainDrops[i].GetComponent<RainBehaviour>().getRandomMaterial()];
 
     rainDrops[i].GetComponent<RainBehaviour>().ySpeed = Random.Range(minRainYSpeed,maxRainYSpeed);
@@ -45,10 +58,6 @@ void Awake(){
     
 
  }
-
-
-
-
 
 
         
@@ -61,6 +70,10 @@ void Update(){
 checkGrounding();
 
 
+
+
+
+}
 void checkGrounding(){
     for(int i =0;i<rainDrops.Length;i++){
     if(rainDrops[i].GetComponent<RainCollision>().isGrounding){
@@ -79,9 +92,6 @@ if(groundedRainCounter>=rainDrops.Length){
     
 }
 }
-
-}
-
 
 }
 

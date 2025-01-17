@@ -38,13 +38,14 @@ GameObject glowChild;
   void OnCollisionEnter(Collision collision)
     {
 
-if(collision.gameObject.name.Equals("NextLevel")){
+if(collision.gameObject.CompareTag("NextLevel")){
 
   levelManager.createLevelPart();
   levelCounter.text = levelManager.currentLevel.ToString();
   doGlowEffect(collision);
    soundManager.playSoundOneShot(SoundManager.SoundType.player,"checkPoint");
-   GetComponent<PlayerMovement>().verticalMoves = -1;
+  
+   
 
 }
 if(collision.gameObject.GetComponent<Renderer>()!=null){
@@ -72,7 +73,11 @@ void Update(){
 
     
     updateIfPlayerCanMove();
-   
+       Vector3 fwd = transform.TransformDirection(Vector3.up);
+
+        if (Physics.Raycast(transform.position, fwd, 10)){
+          
+    }
 
 
  
@@ -134,7 +139,7 @@ public void revivePlayerSingleplayer(){
 GameObject temp = deathParent.Find("PlayerHit_ParticleSystem").gameObject;
   temp.transform.SetParent(gameObject.transform);
   gameObject.SetActive(true);
-  GetComponent<PlayerMovement>().resetMovementCounters();  
+
 gameManager.hideDeathPanel();
 levelCounter.gameObject.SetActive(true);
 levelManager.setPlayerToStartTop();

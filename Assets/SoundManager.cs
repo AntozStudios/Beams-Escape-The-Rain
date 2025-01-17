@@ -8,11 +8,12 @@ public class SoundManager : MonoBehaviour
   
 
 
- [SerializeField]Sounds[] sounds;
+ public Sounds[] sounds;
 
  public enum SoundType{
 player,
-backgroud
+backgroud,
+music
 }
 
 
@@ -20,6 +21,7 @@ public void Start(){
 
 
 playSound(SoundType.backgroud,"rain1");
+playSound(SoundType.music,"Harmony in Space");
 
 
 }
@@ -44,7 +46,7 @@ playSound(SoundType.backgroud,"rain1");
 }
 
 [System.Serializable]
-class Sounds{
+public class Sounds{
 
 
 

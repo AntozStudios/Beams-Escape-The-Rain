@@ -7,7 +7,8 @@ public class LevelManager : MonoBehaviour
 
 GameObject startTop;
 [SerializeField] GameObject player;
-[SerializeField] GameObject LevelPartPrefab;
+[SerializeField] GameObject defaultLevel_prefab;
+[SerializeField] GameObject logLevel_prefab;
 [SerializeField] GameObject deathParent;
 
 
@@ -33,11 +34,18 @@ GameMode gameMode;
 [SerializeField]
 
 
+ enum LevelPartMode{
+defaultMode,
+logMode
+}
+
+LevelPartMode currentLevelPartMode;
+
 void Awake(){
-    
+    currentLevelPartMode = LevelPartMode.defaultMode;
     
          levelUpater();
-updateCurrentStartTop();
+
 }
 
 
@@ -51,6 +59,9 @@ enum GameMode{
     // Start is called before the first frame update
     void Start()
     {
+         updateCurrentStartTop();
+
+       
 setPlayerToStartTop();
        
 
@@ -90,24 +101,35 @@ void checkGameModes(){
 void FixedUpdate(){
     displayAFKCounter();
 }
+
+// Nach Kollision mit NextLevel 
 public void createLevelPart(){
     
 
-GameObject temp = Instantiate(LevelPartPrefab);
+GameObject temp = Instantiate(getLevelPart(currentLevelPartMode));
 levelParts.Add(temp);
 currentLevel++;
-GameObject lastLevelParentChildren =levelParts[levelParts.Count-2].transform.Find("LevelPart").gameObject;
-GameObject nextLevelParentChildren = levelParts[levelParts.Count-1].transform.Find("LevelPart").gameObject;
-GameObject nextLevelParent = levelParts[levelParts.Count-1].gameObject;
 
-nextLevelParent.transform.position = new Vector3(lastLevelParentChildren.transform.position.x,
-lastLevelParentChildren.transform.position.y,lastLevelParentChildren.transform.position.z+nextLevelParentChildren.transform.localScale.z);
+setCurrentPositionForLevelPart();
+
 levelUpater();
 destroyLevelParts();
 
    
 
  
+}
+
+void setCurrentPositionForLevelPart(){
+GameObject lastLevelParentChildren =levelParts[levelParts.Count-2].transform.Find("LevelPart").gameObject;
+GameObject nextLevelParentChildren = levelParts[levelParts.Count-1].transform.Find("LevelPart").gameObject;
+GameObject nextLevelParent = levelParts[levelParts.Count-1].gameObject;
+
+GameObject tempField = lastLevelParentChildren.transform.Find("Field").gameObject;
+CreateField tem = tempField.GetComponent<CreateField>();
+
+nextLevelParent.transform.position = new Vector3(tem.getEndTop().transform.position.x,
+lastLevelParentChildren.transform.position.y,lastLevelParentChildren.transform.position.z+tem.z);
 }
 
 public void destroyLevelParts()
@@ -131,44 +153,50 @@ public void destroyLevelParts()
 
 
 void levelUpater(){
-    if(currentLevel>=0 && currentLevel<=25){
-       levelSettings(2000,5000,GameMode.grassMode,false);
-       currentMode = GameMode.grassMode.ToString();
+   setSpeedForLevel(500,2000);
     
-    }else  if(currentLevel>25 && currentLevel<=50){
-        levelSettings(3000,5000,GameMode.iceMode,false);
-        currentMode = GameMode.iceMode.ToString();
+    if(currentLevel<10){
+           setMaterialForLevelPart(GameMode.grassMode);
     }
-    else  if(currentLevel>50 && currentLevel<=100){
-        levelSettings(4000,8000,GameMode.sandMode,false);
-        currentMode = GameMode.sandMode.ToString();
+    
+    if (currentLevel==1){
+        currentLevelPartMode = LevelPartMode.logMode;
     }
-    else{
-
-
-   int count = Enum.GetValues(typeof(GameMode)).Length;
+    
+    
+if(currentLevel>100){
+  int count = Enum.GetValues(typeof(GameMode)).Length;
    int randomMaterial = UnityEngine.Random.Range(0,count);
    
    currentMode = Enum.GetName(typeof(GameMode),randomMaterial).ToString();
 
-    levelSettings(5000,8000,(GameMode)randomMaterial,false);
-    }
+    setMaterialForLevelPart(GameMode.grassMode);
+
+}
+
+ 
+    
     setAFKCounter();
     
 }
 
-private void levelSettings(float minRainYSpeed,float maxRainYSpeed,GameMode gm,bool random){
-    if(!random){
-levelParts[levelParts.Count-1].GetComponent<RainSpawner>().minRainYSpeed = minRainYSpeed;
-    levelParts[levelParts.Count-1].GetComponent<RainSpawner>().maxRainYSpeed = maxRainYSpeed;
-    gameMode = gm;
-    }else{
-        levelParts[levelParts.Count-1].GetComponent<RainSpawner>().minRainYSpeed = minRainYSpeed;
-    levelParts[levelParts.Count-1].GetComponent<RainSpawner>().maxRainYSpeed = maxRainYSpeed;
-    gameMode = gm;
-    }
+
+private void setMaterialForLevelPart(GameMode gm){
+
     
+    gameMode = gm;
+    
+    currentMode = gm.ToString();
 }
+private void setSpeedForLevel(float minRainYSpeed,float maxRainYSpeed){
+    GameObject tempLevelParent = levelParts[levelParts.Count-1];
+
+tempLevelParent.GetComponent<RainSpawner>().minRainYSpeed = minRainYSpeed;
+    tempLevelParent.GetComponent<RainSpawner>().maxRainYSpeed = maxRainYSpeed;
+  
+}
+
+
 
 
 
@@ -176,19 +204,20 @@ levelParts[levelParts.Count-1].GetComponent<RainSpawner>().minRainYSpeed = minRa
 
 void groundMaterial(Material material){
     
+GameObject currentLevelPart = levelParts[levelParts.Count-1].transform.Find("LevelPart").gameObject;
+GameObject currentField = currentLevelPart.transform.Find("Field").gameObject;
 
-foreach(GameObject g in levelParts[levelParts.Count-1].GetComponent<LevelMaterial>().tops){
     
 if(gameMode == GameMode.grassMode){
-    g.GetComponent<Renderer>().material = material;
+   currentField.GetComponent<CreateField>().drawField(material);
 }else if(gameMode==GameMode.sandMode){
 
-g.GetComponent<Renderer>().material = material;
+     currentField.GetComponent<CreateField>().drawField(material);
 
 }
 else if (gameMode == GameMode.iceMode){
-    g.GetComponent<Renderer>().material = material;
-
+ 
+ currentField.GetComponent<CreateField>().drawField(material);
 
     }
     
@@ -196,7 +225,7 @@ else if (gameMode == GameMode.iceMode){
 
 
 
-}
+
 }
 
 
@@ -216,33 +245,45 @@ else if(currentMode.Equals(GameMode.sandMode.ToString())){
 
 
 void displayAFKCounter(){
-    if(player.GetComponent<PlayerMovement>().startAFKTimer && player.GetComponent<PlayerMovement>().verticalMoves>=1){
+
 afkText.text = "Move or Die: " + player.GetComponent<PlayerMovement>().startAfkCounter.ToString("F1");
 
-}else{
-  afkText.text="";
-}
+
+  
+
 }
 
-
+// Player wird beim StartTop respawnt
 public void setPlayerToStartTop(){
- player.transform.position = new Vector3(startTop.transform.position.x,
+
+player.transform.position = new Vector3(startTop.transform.position.x,
         startTop.transform.position.y+player.transform.localScale.y,
         startTop.transform.position.z);
+
+    
+ 
 }
 
+
+// Aktualisiert den aktuellen start vom LevelPart
 private void updateCurrentStartTop(){
         if(levelParts[levelParts.Count-1]!=null){
             GameObject temp = levelParts[levelParts.Count-1].transform.Find("LevelPart").gameObject;
-            GameObject tempRainTop = temp.transform.Find("RainTop").gameObject;
-            GameObject tempLane = tempRainTop.transform.Find("Lane4 (Middle)").gameObject;
-            startTop = tempLane.transform.Find("Top1").gameObject;
+            GameObject tempField = temp.transform.Find("Field").gameObject;
+            startTop = tempField.GetComponent<CreateField>().startTop;
       
 
         }
 }
 
-
+GameObject getLevelPart(LevelPartMode levelPartMode){
+if(levelPartMode==LevelPartMode.defaultMode){
+    return defaultLevel_prefab;
+}else if(levelPartMode ==LevelPartMode.logMode){
+    return logLevel_prefab;
+}
+return null;
+}
 
 }
 

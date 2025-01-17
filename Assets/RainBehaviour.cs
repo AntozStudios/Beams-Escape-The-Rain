@@ -7,7 +7,7 @@ public class RainBehaviour : MonoBehaviour
   
    
    [HideInInspector] public float ySpeed;
-   public bool isRaining = true;
+   public bool isRaining;
    public Material[] materials;
 
 

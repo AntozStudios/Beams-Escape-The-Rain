@@ -9,12 +9,10 @@ using Quaternion = UnityEngine.Quaternion;
 public class PlayerMovement : MonoBehaviour
 {
     private Vector2 firstTouch, lastTouch; // Touch-Positionen
-    private float movementSize;
     public bool canMove;
+    
 
-    public int verticalMoves;
 
-    public int horizontalMoves;
 
     public GameObject[] hideObjectWhenGameStarts;
 
@@ -48,7 +46,7 @@ public bool startAFKTimer;
 }
     void Start()
     {
-        movementSize = transform.localScale.x;
+    
     }
 
     void Update()
@@ -89,43 +87,35 @@ updatePlayerHasToMove();
     {
         if (Input.GetKeyUp(KeyCode.LeftArrow))
         {
-            if (horizontalMoves > -3)
-            {
+           
                // MovePlayer(Vector3.left);
                  StartCoroutine(Roll(Vector3.left));
                   timeToMoveCounter =0;
-                horizontalMoves--;
-            }
+           
         }
         else if (Input.GetKeyUp(KeyCode.RightArrow))
         {
-            if (horizontalMoves <= 2)
-            {
+            
                // MovePlayer(Vector3.right);
                  StartCoroutine(Roll(Vector3.right));
                timeToMoveCounter =0;
-                horizontalMoves++;
-            }
+             
         }
         else if (Input.GetKeyUp(KeyCode.UpArrow))
         {
-            if (verticalMoves <= 6)
-            {
+           
                // MovePlayer(Vector3.forward);
                  StartCoroutine(Roll(Vector3.forward));
                  timeToMoveCounter =0;
-                verticalMoves += 1;
-            }
+             
         }
         else if (Input.GetKeyUp(KeyCode.DownArrow))
         {
-            if (verticalMoves > 0)
-            {
+            
                // MovePlayer(Vector3.back);
                  StartCoroutine(Roll(Vector3.back));
                    timeToMoveCounter =0;
-                verticalMoves -= 1;
-            }
+            
         }
         
 
@@ -162,28 +152,27 @@ updatePlayerHasToMove();
         Vector2 swipeDirection = endTouch - startTouch;
         if (swipeDirection.magnitude >= swipeThreshold)
         {
+
+
+            
             // Horizontaler Swipe
             if (Mathf.Abs(swipeDirection.x) > Mathf.Abs(swipeDirection.y))
             {
                 if (swipeDirection.x > 0) // Swipe nach rechts
                 {
-                    if (horizontalMoves <= 2)
-                    {
+                   
                     //    MovePlayer(Vector3.right);
                     StartCoroutine(Roll(Vector3.right));
                          timeToMoveCounter =0;
-                        horizontalMoves++;
-                    }
+                     
                 }
                 else // Swipe nach links
                 {
-                    if (horizontalMoves > -3)
-                    {
+                    
                      //   MovePlayer(Vector3.left);
                       StartCoroutine(Roll(Vector3.left));
                           timeToMoveCounter =0;
-                        horizontalMoves--;
-                    }
+                    
                 }
             }
             // Vertikaler Swipe
@@ -191,37 +180,25 @@ updatePlayerHasToMove();
             {
                 if (swipeDirection.y > 0) // Swipe nach oben
                 {
-                    if (verticalMoves <= 6)
-                    {
+                    
                    //     MovePlayer(Vector3.forward);
                     StartCoroutine(Roll(Vector3.forward));
                       timeToMoveCounter =0;
-                        verticalMoves++;
-                    }
+                    
                 }
                 else // Swipe nach unten
                 {
-                    if (verticalMoves > 0)
-                    {
+                    
                  //       MovePlayer(Vector3.back);
                   StartCoroutine(Roll(Vector3.back));
                    timeToMoveCounter =0;
-                        verticalMoves--;
-                    }
+                    
                 }
             }
         }
     }
 
-    void MovePlayer(Vector3 direction)
-    {
-        if(canMove){
- transform.position += direction * movementSize;
-        soundManager.playSoundOneShot(SoundManager.SoundType.player, "player");
-        levelManager.gameStarted = true;
-        }
-       
-    }
+  
 
     
 
@@ -238,7 +215,8 @@ public void timeToMoveCountdown(){
 }
 
 public void afkCountdown(){
-    startAfkCounter-=Time.deltaTime;
+    if(levelManager.gameStarted){
+  startAfkCounter-=Time.deltaTime;
     if(startAFKTimer){
     if(startAfkCounter<=0){
         GetComponent<PlayerCollision>().loose();
@@ -247,25 +225,23 @@ public void afkCountdown(){
 }else{
     startAfkCounter = startAfkMax;
 }
+
+    }
+  
 }
 
 void updatePlayerHasToMove(){
     if(playerHasToMove){
-if(verticalMoves>=1){
+
 
 timeToMoveCountdown();
 afkCountdown();
-}
+
 
 }
 
 }
 
-public void resetMovementCounters(){
-    verticalMoves =0;
-    horizontalMoves =0;
-
-}
 
 private void hideGameObjects( bool value){
     foreach(GameObject g in hideObjectWhenGameStarts){

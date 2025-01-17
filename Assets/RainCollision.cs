@@ -37,6 +37,7 @@ void Start(){
             tempFallOut.transform.position = new Vector3(collision.transform.position.x
             ,collision.transform.position.y+0.5f,
             collision.transform.position.z);
+            
            isGrounding = true;
             Destroy(tempFallOut,0.5f);
             
@@ -63,6 +64,10 @@ void Start(){
 
             
         }else if (collision.gameObject.CompareTag("LevelParent")){
+
+           isGrounding = true;
+
+        }else if (collision.gameObject.CompareTag("NextLevel")){
 
            isGrounding = true;
 
