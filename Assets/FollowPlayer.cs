@@ -16,15 +16,15 @@ public class FollowPlayer : MonoBehaviour
 
     public bool doFollowPlayer;
 
-    void Awake()
-    {
-        initPosCamera = Camera.main.transform.position;
+    void Start(){
+                initPosCamera = Camera.main.transform.position;
         initPosPlayer = player.transform.position;
         cameraPosZ = Mathf.Abs(initPosCamera.z);
         playerPosZ = Mathf.Abs(initPosPlayer.z);
         cameraPosX = Mathf.Abs(initPosCamera.x);
         playerPosX = Mathf.Abs(initPosPlayer.x);
     }
+
 
     void Update()
     {

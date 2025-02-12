@@ -5,105 +5,121 @@ public class CreateField : MonoBehaviour
 {
     [SerializeField] private GameObject topPrefab;
     [SerializeField] private GameObject levelPart;
-    [SerializeField] GameObject nextLevel;
-
-    [HideInInspector]public GameObject startTop;
-
-    RainSpawner rainSpawner;
-
- GameObject pivotObject;
+  
+    [HideInInspector] public GameObject startTop;
     
+    private MyPoint myPoint = new MyPoint(); // Initialisierung von myPoint
 
-    public int x,z;
+    public enum SpawnObject{
+        CENTER,
+        LEFT,
+        RIGHT,
+        BACK,
+        RANDOM
+    }
+    SpawnObject sp;
 
+    private RainSpawner rainSpawner;
+    private GameObject pivotObject;
+    private int x, z;
     public GameObject[,] field;
 
-
-    
-    void Awake(){
+    void Awake()
+    {
+        x = (int)levelPart.transform.localScale.x;
+        z = (int)levelPart.transform.localScale.z;
         
-        field = new GameObject[x,z];
+        field = new GameObject[x, z];
         rainSpawner = GetComponentInParent<RainSpawner>();
 
-         if (topPrefab == null || levelPart == null)
+        if (topPrefab == null || levelPart == null)
         {
             Debug.LogError("topPrefab oder levelPart ist nicht zugewiesen.");
             return;
         }
 
-               for(int i =0;i<x;i++){
-for(int j =0;j<z;j++){
+        for (int i = 0; i < x; i++)
+        {
+            for (int j = 0; j < z; j++)
+            {
+                pivotObject = Instantiate(topPrefab, transform);
+                pivotObject.name = "i: " + i + " j: " + j;
+                field[i, j] = pivotObject;
 
-      // Instanz des Prefabs erstellen
-         pivotObject = Instantiate(topPrefab, transform);
-         pivotObject.name="i: "+i+"j "+j;
-        field[i,j] = pivotObject;
-        
-        float posX = levelPart.transform.position.x - (levelPart.transform.localScale.x / 2) + (pivotObject.transform.localScale.x / 2);
-        float posY = levelPart.transform.position.y + (levelPart.transform.localScale.y / 2) + (pivotObject.transform.localScale.y / 2);
-        float posZ = levelPart.transform.position.z - (levelPart.transform.localScale.z / 2) + (pivotObject.transform.localScale.z / 2);
+                float posX = levelPart.transform.position.x - (levelPart.transform.localScale.x / 2) + (pivotObject.transform.localScale.x / 2);
+                float posY = levelPart.transform.position.y + (levelPart.transform.localScale.y / 2) + (pivotObject.transform.localScale.y / 2);
+                float posZ = levelPart.transform.position.z - (levelPart.transform.localScale.z / 2) + (pivotObject.transform.localScale.z / 2);
 
-        // Position anwenden
-        pivotObject.transform.position = new Vector3(posX+(pivotObject.transform.localScale.x*i), posY, posZ+(pivotObject.transform.localScale.z*j));
+                pivotObject.transform.position = new Vector3(posX + (pivotObject.transform.localScale.x * i), posY, posZ + (pivotObject.transform.localScale.z * j));
 
-if(i==x/2 && j==0){
-    startTop = pivotObject;
+                if (i == x / 2 && j == 0)
+                {
+                    startTop = pivotObject;
+                }
 
-}else if(i==x/2 && j==z-1){
-spawnObjectToTile(nextLevel);
-}else{
-rainSpawner.tops.Add(pivotObject);
+              
+// Hardcode to avoid 0,0
+//Avoiding Rain for targetField
+                  if((i!=x/2|| j!=z-1) ||(i == x / 2 && j == 0)) {
 
-
-
-}
-
-
-
-
-
-
- 
-
-
-    
-
-
-        
+      rainSpawner.tops.Add(pivotObject);
+                }
+                
+              
+                
+            }
+        }
     }
 
-    }
-
-
-    }
-
-    private void Start()
+    private void spawnObjectToTile(int column, int row, GameObject from)
     {
-  
+        Instantiate(from, field[column, row].transform).transform.position = new Vector3(
+            field[column, row].transform.position.x,
+            pivotObject.transform.position.y + from.transform.localScale.y,
+            field[column, row].transform.position.z);
+            myPoint = new MyPoint(column,row);
     }
 
-    void spawnObjectToTile(int i,int j,int a,int b,GameObject from){
-       if(i==a&& j==b){
-    Instantiate(from,pivotObject.transform).transform.position = new Vector3(pivotObject.transform.position.x,pivotObject.transform.position.y+from.transform.localScale.y,pivotObject.transform.position.z);
-    
+    public void spawnObject(SpawnObject mode, GameObject gameObject)
+    {
+        switch (mode)
+        {
+            case SpawnObject.CENTER:
+                spawnObjectToTile(x - 2, (z / 2) - 1, gameObject);
+         
+                break;
+            case SpawnObject.BACK:
+                spawnObjectToTile(x/2,z-1, gameObject);
+            
+                break;
+            case SpawnObject.LEFT:
+                spawnObjectToTile(0, (z / 2) - 1, gameObject);
+             
+                break;
+            case SpawnObject.RIGHT:
+                spawnObjectToTile(x - 1, (z / 2) - 1, gameObject);
+                
+                break;
+            case SpawnObject.RANDOM:
+                break;
+        }
+        Debug.Log($"myPoint: x={myPoint.x}, z={myPoint.z}");
+    }
+
+    public void drawField(Material material)
+    {
+        for (int i = 0; i < x; i++)
+        {
+            for (int j = 0; j < z; j++)
+            {
+                field[i, j].GetComponent<Renderer>().material = material;
+            }
+        }
+    }
 }
-    }
-     void spawnObjectToTile(GameObject from){
-      
-    Instantiate(from,pivotObject.transform).transform.position = new Vector3(pivotObject.transform.position.x,pivotObject.transform.position.y+from.transform.localScale.y,pivotObject.transform.position.z);
-    
 
-    }
-
-    public void drawField(Material material){
-        for(int i =0;i<x;i++){
-            for(int j =0;j<z;j++){
-            field[i,j].GetComponent<Renderer>().material = material;
-        }
-        }
-    }
-
-    public GameObject getEndTop(){
-        return field[x/2,z-1];
-    }
+public class MyPoint {
+    public int x, z;
+    public MyPoint() { x = 0; z = 0; }
+    public MyPoint(int x, int z) { this.x = x; this.z = z; }
 }

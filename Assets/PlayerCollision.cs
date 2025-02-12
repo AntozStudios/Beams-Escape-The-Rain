@@ -73,12 +73,9 @@ void Update(){
 
     
     updateIfPlayerCanMove();
-       Vector3 fwd = transform.TransformDirection(Vector3.up);
+       Vector3 fwd = transform.TransformDirection(Vector3.down);
 
-        if (Physics.Raycast(transform.position, fwd, 10)){
-          
-    }
-
+    
 
  
 

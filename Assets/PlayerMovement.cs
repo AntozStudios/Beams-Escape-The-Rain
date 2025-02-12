@@ -8,6 +8,9 @@ using Quaternion = UnityEngine.Quaternion;
 
 public class PlayerMovement : MonoBehaviour
 {
+
+    int xCounter;
+    int zCounter;
     private Vector2 firstTouch, lastTouch; // Touch-Positionen
     public bool canMove;
     
@@ -64,6 +67,14 @@ if(canMove ){
        HandleKeyboard();
        HandleTouchInput();
         
+        if(xCounter>3){
+            GetComponent<PlayerCollision>().loose();
+        }else if(xCounter<-3){
+                GetComponent<PlayerCollision>().loose();
+        }else if(zCounter<0){
+                 GetComponent<PlayerCollision>().loose();
+        }
+
   
         
 
@@ -90,6 +101,7 @@ updatePlayerHasToMove();
            
                // MovePlayer(Vector3.left);
                  StartCoroutine(Roll(Vector3.left));
+                 xCounter--;
                   timeToMoveCounter =0;
            
         }
@@ -98,6 +110,7 @@ updatePlayerHasToMove();
             
                // MovePlayer(Vector3.right);
                  StartCoroutine(Roll(Vector3.right));
+                 xCounter++;
                timeToMoveCounter =0;
              
         }
@@ -106,6 +119,7 @@ updatePlayerHasToMove();
            
                // MovePlayer(Vector3.forward);
                  StartCoroutine(Roll(Vector3.forward));
+                 zCounter++;
                  timeToMoveCounter =0;
              
         }
@@ -114,6 +128,7 @@ updatePlayerHasToMove();
             
                // MovePlayer(Vector3.back);
                  StartCoroutine(Roll(Vector3.back));
+                 zCounter--;
                    timeToMoveCounter =0;
             
         }

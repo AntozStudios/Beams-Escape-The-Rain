@@ -1,0 +1,1 @@
+C:\Users\haupt\Documents\GitHub\Beams-Escape-The-Rain\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\2j5i6p5u\obj\armeabi-v7a
