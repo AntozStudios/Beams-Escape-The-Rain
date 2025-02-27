@@ -146,6 +146,7 @@ public void ShowRewardedInterstitialAd()
             player.GetComponent<PlayerCollision>().revivePlayerSingleplayer();
             adUsed++;
             deathPanel.GetComponent<AdBannerManager>().DestroyAd();
+      
         });
     }
     else

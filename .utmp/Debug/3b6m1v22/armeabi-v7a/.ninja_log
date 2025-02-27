@@ -1,0 +1,5 @@
+# ninja log v5
+1	219	7622664676404375	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	41246d9ec29d5148
+221	363	7622664677835017	C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/Library/PramData/AndroidApplicationController/Cache/com.AntozStudios.BeamsEscapeTheRain/gradle-project/unityLibrary/build/intermediates/cxx/Debug/3b6m1v22/obj/armeabi-v7a/libswappywrapper.so	c16c6d2291233784
+2	410	7622720802893955	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	41246d9ec29d5148
+411	790	7622720806432289	C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/Library/PramData/AndroidApplicationController/Cache/com.AntozStudios.BeamsEscapeTheRain/gradle-project/unityLibrary/build/intermediates/cxx/Debug/3b6m1v22/obj/armeabi-v7a/libswappywrapper.so	c16c6d2291233784

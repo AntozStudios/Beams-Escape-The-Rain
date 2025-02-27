@@ -15,6 +15,7 @@ public class PlayerCollision : MonoBehaviour
    public LevelManager levelManager;
    
    [SerializeField] TMP_Text levelCounter;
+   public  TMP_Text lifeCounter; 
    public int amountLife= 3;
    [SerializeField] Transform deathParent;
    [SerializeField] SoundManager soundManager;
@@ -28,6 +29,10 @@ public class PlayerCollision : MonoBehaviour
 
 
   
+ }
+
+ void Awake(){
+  lifeCounter.GetComponent<LifeCounter>().change(amountLife);
  }
 
 GameObject glowParent;
@@ -44,7 +49,8 @@ if(collision.gameObject.CompareTag("NextLevel")){
   levelCounter.text = levelManager.currentLevel.ToString();
   doGlowEffect(collision);
    soundManager.playSoundOneShot(SoundManager.SoundType.player,"checkPoint");
-  
+  GetComponent<PlayerMovement>().zCounter =-1;
+
    
 
 }
@@ -55,9 +61,11 @@ amountLife--;
 soundManager.playSoundOneShot(SoundManager.SoundType.player,"hissing");
 if(amountLife==0){
  loose();
- 
+
 
 }
+  lifeCounter.GetComponent<LifeCounter>().change(amountLife);
+
 }
 }
 
@@ -119,6 +127,7 @@ public async void loose(){
   gameManager.showDeathPanel();
   levelCounter.gameObject.SetActive(false);
   amountLife =0;
+  
 
 
        if(levelManager.currentLevel>PlayerPrefs.GetInt("HighScore")){
@@ -130,9 +139,13 @@ public async void loose(){
   }
 
 
+
 }
 
 public void revivePlayerSingleplayer(){
+       GetComponent<PlayerMovement>().timeToMoveCounter =0;
+ 
+ GetComponent<PlayerMovement>().startAFKTimer = false;
 GameObject temp = deathParent.Find("PlayerHit_ParticleSystem").gameObject;
   temp.transform.SetParent(gameObject.transform);
   gameObject.SetActive(true);
@@ -140,6 +153,12 @@ GameObject temp = deathParent.Find("PlayerHit_ParticleSystem").gameObject;
 gameManager.hideDeathPanel();
 levelCounter.gameObject.SetActive(true);
 levelManager.setPlayerToStartTop();
+lifeCounter.GetComponent<LifeCounter>().change(amountLife);
+
+GetComponent<PlayerMovement>().zCounter = 0;
+    GetComponent<PlayerMovement>().xCounter = 0;
+
+    
 
 }
 

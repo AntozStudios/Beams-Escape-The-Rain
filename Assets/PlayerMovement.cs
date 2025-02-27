@@ -9,8 +9,8 @@ using Quaternion = UnityEngine.Quaternion;
 public class PlayerMovement : MonoBehaviour
 {
 
-    int xCounter;
-    int zCounter;
+    public int xCounter;
+    public int zCounter;
     private Vector2 firstTouch, lastTouch; // Touch-Positionen
     public bool canMove;
     
@@ -57,27 +57,20 @@ public bool startAFKTimer;
 
         hideGameObjects(!levelManager.gameStarted);
         levelCounter.gameObject.SetActive(levelManager.gameStarted);
-    
 
        
 if(canMove ){
      
-  
+   if(xCounter>-3 && xCounter<3 &&zCounter<7 &&zCounter>0){
+
+   }
 
        HandleKeyboard();
        HandleTouchInput();
         
-        if(xCounter>3){
-            GetComponent<PlayerCollision>().loose();
-        }else if(xCounter<-3){
-                GetComponent<PlayerCollision>().loose();
-        }else if(zCounter<0){
-                 GetComponent<PlayerCollision>().loose();
-        }
-
+        
   
         
-
   
 
         }
@@ -96,40 +89,47 @@ updatePlayerHasToMove();
 
     void HandleKeyboard()
     {
+        
         if (Input.GetKeyUp(KeyCode.LeftArrow))
         {
            
-               // MovePlayer(Vector3.left);
-                 StartCoroutine(Roll(Vector3.left));
+               if(xCounter>-3){
+         StartCoroutine(Roll(Vector3.left));
                  xCounter--;
                   timeToMoveCounter =0;
+               }
+        
            
         }
         else if (Input.GetKeyUp(KeyCode.RightArrow))
         {
             
-               // MovePlayer(Vector3.right);
+                   if(xCounter<3){
                  StartCoroutine(Roll(Vector3.right));
                  xCounter++;
                timeToMoveCounter =0;
+                   }
              
         }
         else if (Input.GetKeyUp(KeyCode.UpArrow))
         {
            
-               // MovePlayer(Vector3.forward);
+                if(zCounter<7){
                  StartCoroutine(Roll(Vector3.forward));
                  zCounter++;
                  timeToMoveCounter =0;
+                }
              
         }
         else if (Input.GetKeyUp(KeyCode.DownArrow))
         {
             
-               // MovePlayer(Vector3.back);
-                 StartCoroutine(Roll(Vector3.back));
+                if(zCounter>0){
+ StartCoroutine(Roll(Vector3.back));
                  zCounter--;
                    timeToMoveCounter =0;
+                }
+                
             
         }
         
@@ -173,20 +173,30 @@ updatePlayerHasToMove();
             // Horizontaler Swipe
             if (Mathf.Abs(swipeDirection.x) > Mathf.Abs(swipeDirection.y))
             {
+            
                 if (swipeDirection.x > 0) // Swipe nach rechts
                 {
                    
-                    //    MovePlayer(Vector3.right);
+                    
+                         if(xCounter<3){
                     StartCoroutine(Roll(Vector3.right));
                          timeToMoveCounter =0;
+                         xCounter++;
+
+                         }
+                   
                      
                 }
+                  
                 else // Swipe nach links
                 {
                     
-                     //   MovePlayer(Vector3.left);
+                            if(xCounter>-3){
                       StartCoroutine(Roll(Vector3.left));
                           timeToMoveCounter =0;
+                                     xCounter--;
+                              }
+                      
                     
                 }
             }
@@ -196,17 +206,22 @@ updatePlayerHasToMove();
                 if (swipeDirection.y > 0) // Swipe nach oben
                 {
                     
-                   //     MovePlayer(Vector3.forward);
+              if(zCounter<7){
                     StartCoroutine(Roll(Vector3.forward));
                       timeToMoveCounter =0;
+                      zCounter++;
+              }
+                  
                     
                 }
                 else // Swipe nach unten
                 {
                     
-                 //       MovePlayer(Vector3.back);
+         if(zCounter>0){
                   StartCoroutine(Roll(Vector3.back));
                    timeToMoveCounter =0;
+                   zCounter--;
+         }
                     
                 }
             }

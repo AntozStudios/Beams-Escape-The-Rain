@@ -27,7 +27,6 @@ public class LevelManager : MonoBehaviour
 
     GameMode gameMode;
 
-    LevelPartDirection currentPartDir;
     LevelPartMode currentLevelPartMode;
     string currentMode;
     public int currentLevel = 0;
@@ -50,7 +49,7 @@ public class LevelManager : MonoBehaviour
         updateCurrentStartTop();
         checkGameModes();
 
-     
+     Debug.Log(gameStarted);
     }
 
     void FixedUpdate()
@@ -113,7 +112,7 @@ public class LevelManager : MonoBehaviour
         }
        
 
-        currentPartDir = levelPartDirection;
+    
         currentParent_LevelPart.transform.position = newPos;
     }
 }
@@ -194,14 +193,6 @@ setMaterialForLevelPart((GameMode)Random.Range(0, max));
 }
 
 
-    int getXOR(int a,int b){
-       
-        if(directionCounter%2==0){
-            return a;
-        }else{
-            return b;
-        }
-    }
 
     void setMaterialForLevelPart(GameMode gm)
     {
