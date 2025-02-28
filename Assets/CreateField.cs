@@ -60,10 +60,10 @@ public class CreateField : MonoBehaviour
               
 // Hardcode to avoid 0,0
 //Avoiding Rain for targetField
-bool left = (i!=x/2)&&( j!=z-1);
-bool right = (i != 3) && (j != 0);
-                  if(left || right) {
-Debug.Log(i+"  "+j);
+bool left = (i==x/2)&&( j==z-1);
+bool right = (i == 3) && (j == 0);
+                  if(!left && !right) {
+
       rainSpawner.tops.Add(pivotObject);
                 }
                 

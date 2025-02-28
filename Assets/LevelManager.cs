@@ -46,6 +46,7 @@ public class LevelManager : MonoBehaviour
 
     void Update()
     {
+        
         updateCurrentStartTop();
         checkGameModes();
 
@@ -136,6 +137,7 @@ Bounds GetObjectBounds(GameObject obj)
 
     public void destroyLevelParts()
     {
+        
         if (levelParts.Count > 3)
         {
             Destroy(levelParts[0]);
@@ -225,9 +227,12 @@ setMaterialForLevelPart((GameMode)Random.Range(0, max));
     void displayAFKCounter()
     {
         if(player.GetComponent<PlayerMovement>().startAFKTimer && gameStarted){
+            afkText.gameObject.SetActive(true);
 afkText.text = "Move or Die: " + player.GetComponent<PlayerMovement>().startAfkCounter.ToString("F1");
         }else{
 afkText.text = "";
+     afkText.gameObject.SetActive(false);
+          
         }
         
     }
