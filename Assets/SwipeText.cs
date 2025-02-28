@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class SwipeText : MonoBehaviour
 {
     [SerializeField] GameObject player;
+  
     void Awake(){
         GetComponent<Button>().onClick.AddListener(()=>Destroy(gameObject));
     }
@@ -12,6 +13,7 @@ public class SwipeText : MonoBehaviour
 
     if(player!=null){
   player.GetComponent<PlayerMovement>().canMove = true;
+  player.GetComponent<PlayerCollision>().lifeCounter.gameObject.SetActive(true);
     }
   
   }
