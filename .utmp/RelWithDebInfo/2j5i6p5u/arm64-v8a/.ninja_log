@@ -1,3 +1,5 @@
 # ninja log v5
-0	772	7624714815747285	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	acba13cc81b7839f
-775	1135	7624714818696346	C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/2j5i6p5u/obj/arm64-v8a/libswappywrapper.so	e38587d33db051b
+9	646	7624847042754827	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	acba13cc81b7839f
+647	1310	7624847048945681	C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/2j5i6p5u/obj/arm64-v8a/libswappywrapper.so	e38587d33db051b
+17	451	7625466391213019	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	acba13cc81b7839f
+452	1161	7625466396470778	C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/2j5i6p5u/obj/arm64-v8a/libswappywrapper.so	e38587d33db051b

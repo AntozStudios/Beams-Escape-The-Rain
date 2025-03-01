@@ -6,7 +6,7 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/Debug/3b6m1v22/armeabi-v7a/CMakeFiles/3.22.1-g37088a8-dirty/CMakeSystem.cmake"
+			"path" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/RelWithDebInfo/2j5i6p5u/armeabi-v7a/CMakeFiles/3.22.1-g37088a8-dirty/CMakeSystem.cmake"
 		},
 		{
 			"isExternal" : true,
@@ -36,11 +36,11 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/Debug/3b6m1v22/armeabi-v7a/CMakeFiles/3.22.1-g37088a8-dirty/CMakeCCompiler.cmake"
+			"path" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/RelWithDebInfo/2j5i6p5u/armeabi-v7a/CMakeFiles/3.22.1-g37088a8-dirty/CMakeCCompiler.cmake"
 		},
 		{
 			"isGenerated" : true,
-			"path" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/Debug/3b6m1v22/armeabi-v7a/CMakeFiles/3.22.1-g37088a8-dirty/CMakeCXXCompiler.cmake"
+			"path" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/RelWithDebInfo/2j5i6p5u/armeabi-v7a/CMakeFiles/3.22.1-g37088a8-dirty/CMakeCXXCompiler.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -187,14 +187,14 @@
 		},
 		{
 			"isExternal" : true,
-			"path" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/Debug/3b6m1v22/prefab/armeabi-v7a/prefab/lib/arm-linux-androideabi/cmake/games-frame-pacing/games-frame-pacingConfig.cmake"
+			"path" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/RelWithDebInfo/2j5i6p5u/prefab/armeabi-v7a/prefab/lib/arm-linux-androideabi/cmake/games-frame-pacing/games-frame-pacingConfig.cmake"
 		}
 	],
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/Debug/3b6m1v22/armeabi-v7a",
-		"source" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/Library/PramData/AndroidApplicationController/Cache/com.AntozStudios.BeamsEscapeTheRain/gradle-project/unityLibrary/src/main/cpp"
+		"build" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/RelWithDebInfo/2j5i6p5u/armeabi-v7a",
+		"source" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp"
 	},
 	"version" : 
 	{

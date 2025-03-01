@@ -52,40 +52,20 @@ public bool startAFKTimer;
     
     }
 
-    void Update()
+   void Update()
+{
+    hideGameObjects(!levelManager.gameStarted);
+    levelCounter.gameObject.SetActive(levelManager.gameStarted);
+
+    if (canMove)
     {
-
-        hideGameObjects(!levelManager.gameStarted);
-        levelCounter.gameObject.SetActive(levelManager.gameStarted);
-
-       
-if(canMove ){
-     
-   if(xCounter>-3 && xCounter<3 &&zCounter<7 &&zCounter>0){
-
-   }
-
-       HandleKeyboard();
-       HandleTouchInput();
-        
-        
-  
-        
-  
-
-        }
-
-   
-        
-        
-updatePlayerHasToMove();
-
-
-
-
-
-      
+        HandleKeyboard();
+        HandleTouchInput();
     }
+
+    updatePlayerHasToMove();
+}
+
 
     void HandleKeyboard()
     {
