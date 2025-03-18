@@ -83,7 +83,7 @@ if(this!=null){
             }else if(tutorialState==1){
                 GameObject swipeTutorial = Instantiate(nextPrefab,transform);
               
-                swipeTutorial.GetComponent<PopUp>().content.text ="Let's learn the controls";
+                swipeTutorial.GetComponent<PopUp>().content.text ="Let's learn the controls.";
                 swipeTutorial.GetComponent<PopUp>().nextButton.onClick.AddListener(()=> {
                     tutorialState=2;
                     swipeTutorial.GetComponent<PopUp>().hidePopUp();
@@ -95,7 +95,7 @@ if(this!=null){
                 player.GetComponent<PlayerMovement>().canMove = true;
                 player.GetComponent<PlayerMovement>().canLeftSwipe = true;
                 swipeObject.GetComponent<Animator>().SetBool("Left",true);
-                swipeText.text ="SWIPE TO LEFT";
+                swipeText.text ="SWIPE LEFT";
                 
                 
             }else if(tutorialState==3){
@@ -104,15 +104,15 @@ if(this!=null){
                
                 player.GetComponent<PlayerMovement>().canLeftSwipe = false;
                 player.GetComponent<PlayerMovement>().canRightSwipe = true;
-                swipeText.text ="SWIPE TO RIGHT"; 
+                swipeText.text ="SWIPE RIGHT"; 
             }else if(tutorialState==4){
-                swipeText.text ="SWIPE TO UP"; 
+                swipeText.text ="SWIPE UP"; 
                 swipeObject.GetComponent<Animator>().SetBool("Right",false);
                 swipeObject.GetComponent<Animator>().SetBool("Up",true);
                 player.GetComponent<PlayerMovement>().canRightSwipe = false;
                 player.GetComponent<PlayerMovement>().canUpSwipe = true;
             }else if(tutorialState==5){
-                swipeText.text ="SWIPE TO DOWN"; 
+                swipeText.text ="SWIPE DOWN"; 
                 swipeObject.GetComponent<Animator>().SetBool("Up",false);
                 swipeObject.GetComponent<Animator>().SetBool("Down",true);
                 player.GetComponent<PlayerMovement>().canUpSwipe = false;
@@ -124,7 +124,7 @@ if(this!=null){
                 swipeText.text ="";
                 swipeObject.SetActive(false);
                 GameObject levelGrass = Instantiate(nextPrefab,transform);
-                levelGrass.GetComponent<PopUp>().content.text ="You have to keep moving, you can't stay still for long. Grass: Max 6 seconds before you die.";
+                levelGrass.GetComponent<PopUp>().content.text ="You have to keep moving, you can't stay still for long.       Grass: Max 6 seconds before you die.";
                 levelGrass.GetComponent<PopUp>().showPopUp();
                 levelGrass.GetComponent<PopUp>().nextButton.onClick.AddListener(()=> {
                     
@@ -163,7 +163,7 @@ if(this!=null){
                 
             }else if(tutorialState==9){
                 GameObject rainTutorial = Instantiate(nextPrefab,transform);
-                rainTutorial.GetComponent<PopUp>().content.text="Each level has a unique rain pattern. The pattern stays the same after respawning, but be careful – you must dodge the red rain!";
+                rainTutorial.GetComponent<PopUp>().content.text="Each level has a unique rain pattern.    The pattern stays the same after respawning, but be careful – you must dodge the red rain!";
                 rainTutorial.GetComponent<PopUp>().showPopUp();
                 rainTutorial.GetComponent<PopUp>().nextButton.onClick.AddListener(()=> {
                     
