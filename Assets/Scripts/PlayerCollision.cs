@@ -21,7 +21,7 @@ public class PlayerCollision : MonoBehaviour
    [SerializeField] SoundManager soundManager;
    [SerializeField] GameManager gameManager;
    [SerializeField] PlayerAccountsDemo playerAccountsDemo;
-   
+   public bool godMode;
   
   
 
@@ -57,7 +57,10 @@ if(collision.gameObject.CompareTag("NextLevel")){
 if(collision.gameObject.GetComponent<Renderer>()!=null){
 
 if(collision.gameObject.GetComponent<Renderer>().material.name.Contains("RedRain")){
+  if(!godMode){
 amountLife--;
+  }
+
 soundManager.playSoundOneShot(SoundManager.SoundType.player,"hissing");
 if(amountLife==0){
  loose();

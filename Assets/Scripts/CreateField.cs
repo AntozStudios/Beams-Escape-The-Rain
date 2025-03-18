@@ -105,7 +105,7 @@ bool right = (i == 3) && (j == 0);
             case SpawnObject.RANDOM:
                 break;
         }
-        Debug.Log($"myPoint: x={myPoint.x}, z={myPoint.z}");
+        
     }
 
     public void drawField(Material material)

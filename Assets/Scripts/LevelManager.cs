@@ -11,10 +11,9 @@ public class LevelManager : MonoBehaviour
     GameObject startTop;
     [SerializeField] GameObject player;
     [SerializeField] GameObject defaultLevel_prefab;
-    [SerializeField] GameObject logLevel_prefab;
     [SerializeField] GameObject deathParent;
     [SerializeField] TMP_Text afkText;
-    [SerializeField] Material sandMaterial, iceMaterial, grassMaterial;
+    [HideInInspector]public Material sandMaterial, iceMaterial, grassMaterial;
 
     enum LevelPartDirection { BACK, LEFT, RIGHT }
     enum GameMode { sandMode, iceMode, grassMode }
@@ -29,26 +28,35 @@ public class LevelManager : MonoBehaviour
 
     LevelPartMode currentLevelPartMode;
     string currentMode;
+    
     public int currentLevel = 0;
+
+    public CreateField createField;
+
+    public GameObject nextLevelObject;
+
+    
+
 
     void Start()
     {
         if (levelParts.Count == 0)
         {
-            GameObject temp = Instantiate(getLevelPart(currentLevelPartMode));
+            GameObject temp = Instantiate(defaultLevel_prefab);
             Destroy(temp.GetComponentInChildren<Animator>());
             levelParts.Add(temp);
         }
         levelUpdater();
         updateCurrentStartTop();
         setPlayerToStartTop();
+         checkGameModes();
     }
 
     void Update()
     {
         
         updateCurrentStartTop();
-        checkGameModes();
+
 
      
     }
@@ -67,6 +75,7 @@ public class LevelManager : MonoBehaviour
 
  public void createLevelPart()
 {
+   
     currentLevel++;
 
     // Erstelle den LevelPart basierend auf dem aktuellen Modus
@@ -157,6 +166,7 @@ Bounds GetObjectBounds(GameObject obj)
 void levelUpdater()
 {
     setSpeedForLevel(500, 2000);
+     
     
 
     if (levelParts.Count == 0) {
@@ -164,13 +174,15 @@ void levelUpdater()
         return;
     }
 
-    CreateField createField = levelParts[^1].GetComponentInChildren<CreateField>();
+     createField = levelParts[^1].GetComponentInChildren<CreateField>();
      if (createField == null) {
         Debug.LogError("CreateField nicht gefunden!");
         return;
     }
 
-    createField.spawnObject(CreateField.SpawnObject.BACK, GameObject_Container.Instance.nextLevel);
+
+   createField.spawnObject(CreateField.SpawnObject.BACK, GameObject_Container.Instance.nextLevel);
+
     currentLevelPartMode = LevelPartMode.defaultMode;
    if(currentLevel==0){
      setMaterialForLevelPart(GameMode.grassMode);
@@ -179,12 +191,12 @@ void levelUpdater()
 setMaterialForLevelPart((GameMode)Random.Range(0, max));
 
    }
-    setCurrentPositionForLevelPart(LevelPartDirection.BACK);
+   setCurrentPositionForLevelPart(LevelPartDirection.BACK);
    
     
 
     
-   
+   checkGameModes();
 
    
             
@@ -209,7 +221,7 @@ setMaterialForLevelPart((GameMode)Random.Range(0, max));
         rainSpawner.maxRainYSpeed = maxRainYSpeed;
     }
 
-    void groundMaterial(Material material)
+    public void groundMaterial(Material material)
     {
         CreateField createField = levelParts[^1].transform.Find("LevelPart/Field").GetComponent<CreateField>();
         createField.drawField(material);
@@ -226,7 +238,8 @@ setMaterialForLevelPart((GameMode)Random.Range(0, max));
 
     void displayAFKCounter()
     {
-        if(player.GetComponent<PlayerMovement>().startAFKTimer && gameStarted){
+        if(player!=null){
+  if(player.GetComponent<PlayerMovement>().startAFKTimer && gameStarted){
             afkText.gameObject.SetActive(true);
 afkText.text = "Move or Die: " + player.GetComponent<PlayerMovement>().startAfkCounter.ToString("F1");
         }else{
@@ -234,12 +247,14 @@ afkText.text = "";
      afkText.gameObject.SetActive(false);
           
         }
+        }
+      
         
     }
 
     public void setPlayerToStartTop()
     {
-        player.transform.position = new Vector3(
+         player.transform.position = new Vector3(
             startTop.transform.position.x,
             startTop.transform.position.y + player.transform.localScale.y,
             startTop.transform.position.z
@@ -248,14 +263,35 @@ afkText.text = "";
 
     void updateCurrentStartTop()
     {
-        if (levelParts.Count > 0)
+        if (levelParts.Count > 0 && levelParts[0]!=null )
         {
+           
             startTop = levelParts[^1].transform.Find("LevelPart/Field").GetComponent<CreateField>().startTop;
+
+            
         }
     }
 
-    GameObject getLevelPart(LevelPartMode levelPartMode)
-    {
-        return levelPartMode == LevelPartMode.defaultMode ? defaultLevel_prefab : logLevel_prefab;
+   
+
+public void setRainForLevel(int level, bool value){
+    foreach(GameObject g in levelParts[level].GetComponent<RainSpawner>().rainDrops){
+        g.GetComponent<RainBehaviour>().isRaining = value;
     }
+}
+
+
+
+public GameObject getCurrentNextLevel(){
+    GameObject nextLevel = null;
+    if(levelParts.Count>0){
+        GameObject currentLevelPart = levelParts[0];
+        GameObject levelPart = currentLevelPart.transform.Find("LevelPart").gameObject;
+        GameObject field = levelPart.transform.Find("Field").gameObject;
+        GameObject fieldNextLevel = field.transform.Find("i: 3 j: 7").gameObject;
+        nextLevel = fieldNextLevel.transform.Find("NextLevel(Clone)").gameObject;
+    }
+    return nextLevel;
+}
+
 }

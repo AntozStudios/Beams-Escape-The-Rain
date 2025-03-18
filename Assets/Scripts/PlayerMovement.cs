@@ -39,6 +39,20 @@ public float timeToMoveMax;
 
 public bool playerHasToMove;
 
+public bool canLeftSwipe,canRightSwipe,canDownSwipe,canUpSwipe;
+
+[HideInInspector]public enum LastSwipe{
+
+IDLE,
+LEFT,
+RIGHT,
+DOWN,
+UP
+
+
+}
+
+public LastSwipe lastSwipe;
 
 public bool startAFKTimer;
     public float speed;
@@ -70,49 +84,52 @@ public bool startAFKTimer;
     void HandleKeyboard()
     {
         
-        if (Input.GetKeyUp(KeyCode.LeftArrow))
+ if (Input.GetKeyUp(KeyCode.LeftArrow))
         {
-           
-               if(xCounter>-3){
+           if(canLeftSwipe){
+     if(xCounter>-3){
          StartCoroutine(Roll(Vector3.left));
                  xCounter--;
                   timeToMoveCounter =0;
                }
+                lastSwipe = LastSwipe.LEFT;
+           }
+          
         
-           
-        }
-        else if (Input.GetKeyUp(KeyCode.RightArrow))
+          
+        }else if (Input.GetKeyUp(KeyCode.RightArrow))
         {
-            
+            if(canRightSwipe){
                    if(xCounter<3){
                  StartCoroutine(Roll(Vector3.right));
                  xCounter++;
                timeToMoveCounter =0;
                    }
-             
-        }
-        else if (Input.GetKeyUp(KeyCode.UpArrow))
-        {
-           
+                        lastSwipe = LastSwipe.RIGHT;
+            }
+        }else if (Input.GetKeyUp(KeyCode.UpArrow)){
+           if(canUpSwipe){
                 if(zCounter<7){
                  StartCoroutine(Roll(Vector3.forward));
                  zCounter++;
                  timeToMoveCounter =0;
                 }
+             lastSwipe = LastSwipe.UP;
+           }
+
+              
              
-        }
-        else if (Input.GetKeyUp(KeyCode.DownArrow))
-        {
-            
+        } else if (Input.GetKeyUp(KeyCode.DownArrow)){
+            if(canDownSwipe){
                 if(zCounter>0){
  StartCoroutine(Roll(Vector3.back));
                  zCounter--;
                    timeToMoveCounter =0;
                 }
-                
-            
+                      lastSwipe = LastSwipe.DOWN;
+                 
         }
-        
+        }
 
     }
 
@@ -142,41 +159,44 @@ public bool startAFKTimer;
 }
     void HandleSwipe(Vector2 startTouch, Vector2 endTouch)
     {
-        float swipeThreshold = 100f; // Mindest-Swipe-Länge für eine Bewegung
+        float swipeThreshold = 50; // Mindest-Swipe-Länge für eine Bewegung
 
         Vector2 swipeDirection = endTouch - startTouch;
         if (swipeDirection.magnitude >= swipeThreshold)
         {
 
-
-            
             // Horizontaler Swipe
             if (Mathf.Abs(swipeDirection.x) > Mathf.Abs(swipeDirection.y))
             {
             
                 if (swipeDirection.x > 0) // Swipe nach rechts
                 {
-                   
-                    
-                         if(xCounter<3){
+                   if(canRightSwipe){
+   if(xCounter<3){
                     StartCoroutine(Roll(Vector3.right));
                          timeToMoveCounter =0;
                          xCounter++;
 
                          }
+                         lastSwipe = LastSwipe.RIGHT;
+
+                   }
+                    
+                      
                    
                      
                 }
                   
                 else // Swipe nach links
                 {
-                    
+                    if(canLeftSwipe){
                             if(xCounter>-3){
                       StartCoroutine(Roll(Vector3.left));
                           timeToMoveCounter =0;
                                      xCounter--;
                               }
-                      
+                              lastSwipe = LastSwipe.LEFT;
+                    }
                     
                 }
             }
@@ -185,24 +205,26 @@ public bool startAFKTimer;
             {
                 if (swipeDirection.y > 0) // Swipe nach oben
                 {
-                    
+                    if(canUpSwipe){
+
               if(zCounter<7){
                     StartCoroutine(Roll(Vector3.forward));
                       timeToMoveCounter =0;
                       zCounter++;
               }
-                  
-                    
+                  lastSwipe = LastSwipe.UP;
+                    }
                 }
                 else // Swipe nach unten
                 {
-                    
+                    if(canDownSwipe){
          if(zCounter>0){
                   StartCoroutine(Roll(Vector3.back));
                    timeToMoveCounter =0;
                    zCounter--;
          }
-                    
+         lastSwipe = LastSwipe.DOWN;
+                    }
                 }
             }
         }

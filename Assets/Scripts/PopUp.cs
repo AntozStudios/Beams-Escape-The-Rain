@@ -8,16 +8,21 @@ public class PopUp : MonoBehaviour
 {
   
 
-   [HideInInspector] public TMP_Text text;
 
 
     private Animator animator;
+    public TMP_Text content;
+    public Button yesButton,noButton,nextButton;
 
 
 
     
     void Awake(){
       animator = GetComponentInChildren<Animator>();
+     
+    }
+
+    void Start(){
      
     }
 public void showPopUp(){
