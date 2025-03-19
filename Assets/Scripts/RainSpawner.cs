@@ -23,7 +23,7 @@ private LevelManager levelManager;
     
 
 void Awake(){
-    levelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();   
+ 
    
 
 
@@ -33,14 +33,15 @@ void Awake(){
     void Start()
     {
      
- 
+     levelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();  
 
-
+Random.InitState(levelManager.currentLevel);
+Debug.Log(levelManager.currentLevel);
     rainDrops = new GameObject[tops.Count];
 
     
 
-        Random.InitState(levelManager.currentLevel);
+       
 
  
  for(int i =0;i<tops.Count;i++){

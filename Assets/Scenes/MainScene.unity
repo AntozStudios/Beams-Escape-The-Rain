@@ -588,7 +588,6 @@ GameObject:
   m_Component:
   - component: {fileID: 487155931}
   - component: {fileID: 487155932}
-  - component: {fileID: 487155933}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -635,20 +634,7 @@ MonoBehaviour:
   currentLevel: 0
   createField: {fileID: 0}
   nextLevelObject: {fileID: 0}
---- !u!114 &487155933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 487155930}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e80c0d535e4f0834a907169f180c4d70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nextLevel: {fileID: 4288678719341042678, guid: 72e251ab00727cd49a5d828f6e89e0c2, type: 3}
-  pivotObject: {fileID: 0}
+  nextLevel_Prefab: {fileID: 4288678719341042678, guid: 72e251ab00727cd49a5d828f6e89e0c2, type: 3}
 --- !u!1 &566444856
 GameObject:
   m_ObjectHideFlags: 0
@@ -4727,7 +4713,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.000011444092, y: 16.039747}
+  m_AnchoredPosition: {x: 0.000011444092, y: 17.332682}
   m_SizeDelta: {x: 0, y: 220.529}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1147453737616094930
@@ -4912,8 +4898,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3555650069553352476}
   m_HandleRect: {fileID: 3836808970997818435}
   m_Direction: 2
-  m_Value: -0.000032346234
-  m_Size: 0.9271386
+  m_Value: -0.080645435
+  m_Size: 0.9011313
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -23629,7 +23615,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1223636590471524047, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000009747799
+      value: 9.239128
       objectReference: {fileID: 0}
     - target: {fileID: 1286974240587601285, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
       propertyPath: m_Value

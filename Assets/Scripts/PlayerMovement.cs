@@ -159,7 +159,7 @@ public bool startAFKTimer;
 }
     void HandleSwipe(Vector2 startTouch, Vector2 endTouch)
     {
-        float swipeThreshold = 50; // Mindest-Swipe-Länge für eine Bewegung
+        float swipeThreshold = 100; // Mindest-Swipe-Länge für eine Bewegung
 
         Vector2 swipeDirection = endTouch - startTouch;
         if (swipeDirection.magnitude >= swipeThreshold)

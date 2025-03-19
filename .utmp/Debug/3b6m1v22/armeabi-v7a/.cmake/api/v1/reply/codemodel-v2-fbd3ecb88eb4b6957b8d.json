@@ -66,7 +66,7 @@
 				{
 					"directoryIndex" : 1,
 					"id" : "swappywrapper::@7e25bd1f32ce224db4e9",
-					"jsonFile" : "target-swappywrapper-Debug-1778a2f8e59762714b37.json",
+					"jsonFile" : "target-swappywrapper-Debug-6d891f68bab57adaa6c1.json",
 					"name" : "swappywrapper",
 					"projectIndex" : 1
 				}
@@ -76,8 +76,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/Debug/3b6m1v22/arm64-v8a",
-		"source" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/Library/PramData/AndroidApplicationController/Cache/com.AntozStudios.BeamsEscapeTheRain/gradle-project/unityLibrary/src/main/cpp"
+		"build" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/.utmp/Debug/3b6m1v22/armeabi-v7a",
+		"source" : "C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp"
 	},
 	"version" : 
 	{

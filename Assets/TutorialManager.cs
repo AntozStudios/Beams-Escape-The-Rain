@@ -30,6 +30,7 @@ public class TutorialManager : MonoBehaviour
 
 if(tutorialFinished.Equals("Yes")){
     this.enabled = false;
+   
 }
     }
 
@@ -265,7 +266,7 @@ Debug.Log(tutorialState);
 IEnumerator LoadSceneWithDelay()
 {
     yield return new WaitForSeconds(1f);  // Kleine Verzögerung für sicheres Speichern
-    SceneManager.LoadScene(0);
+      SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name);
 }
 
 

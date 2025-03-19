@@ -31,11 +31,14 @@ public class LevelManager : MonoBehaviour
     
     public int currentLevel = 0;
 
-    public CreateField createField;
+   [HideInInspector] public CreateField createField;
 
-    public GameObject nextLevelObject;
+    [HideInInspector] public GameObject nextLevelObject;
 
     
+public GameObject nextLevel_Prefab;
+
+
 
 
     void Start()
@@ -165,6 +168,7 @@ Bounds GetObjectBounds(GameObject obj)
 
 void levelUpdater()
 {
+    
     setSpeedForLevel(500, 2000);
      
     
@@ -181,7 +185,7 @@ void levelUpdater()
     }
 
 
-   createField.spawnObject(CreateField.SpawnObject.BACK, GameObject_Container.Instance.nextLevel);
+   createField.spawnObject(CreateField.SpawnObject.BACK, nextLevel_Prefab);
 
     currentLevelPartMode = LevelPartMode.defaultMode;
    if(currentLevel==0){

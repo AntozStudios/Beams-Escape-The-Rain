@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/Library/PramData/AndroidApplicationController/Cache/com.AntozStudios.BeamsEscapeTheRain/gradle-project/unityLibrary/src/main/cpp
+# Install script for directory: C:/Users/haupt/Documents/GitHub/Beams-Escape-The-Rain/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
