@@ -20,11 +20,16 @@ public class SettingsPanel : MonoBehaviour
 
 
     [SerializeField] SoundManager soundManager;
-    AudioSource music;
+    AudioSource music,rain;
     [SerializeField] Slider musicSlider;
+
+
+    [SerializeField] TMP_Text rainValueText;
+    [SerializeField] Slider rainSlider;
 
     void Awake()
     {
+        rain = soundManager.sounds[1].soundChildren.GetComponent<AudioSource>();
         music = soundManager.sounds[2].soundChildren.GetComponent<AudioSource>();
 
 
@@ -35,6 +40,25 @@ public class SettingsPanel : MonoBehaviour
 
     void Start()
     {
+        ///////////////////
+        
+
+  float tempRainValue = PlayerPrefs.GetFloat("LastRainVolume");
+        if (tempRainValue > 0)
+        {
+            rain.volume = tempRainValue;
+            rainSlider.value = tempRainValue;
+            rainValueText.text = PlayerPrefs.GetFloat("LastRainVolume").ToString("F2");
+        }
+        else
+        {
+            rain.volume = rainSlider.value;
+            rainValueText.text = rainSlider.value.ToString("F2");
+        }
+
+
+
+        //////////////////
         float tempMusicValue = PlayerPrefs.GetFloat("LastMusicVolume");
         if (tempMusicValue > 0)
         {
@@ -96,7 +120,8 @@ public class SettingsPanel : MonoBehaviour
         postProcessingSlider.onValueChanged.AddListener((value) => changeSliderVignette());
 
 
-        musicSlider.onValueChanged.AddListener((value) => changeVolume());
+        musicSlider.onValueChanged.AddListener((value) => changeVolume_Music());
+                rainSlider.onValueChanged.AddListener((value) => changeVolume_Rain());
 
 
     }
@@ -132,10 +157,16 @@ public class SettingsPanel : MonoBehaviour
         }
     }
 
-    void changeVolume()
+    void changeVolume_Music()
     {
         music.volume = musicSlider.value;
         musicValueText.text = musicSlider.value.ToString("F2");
         PlayerPrefs.SetFloat("LastMusicVolume", music.volume);
+    }
+     void changeVolume_Rain()
+    {
+        rain.volume = rainSlider.value;
+        rainValueText.text = rainSlider.value.ToString("F2");
+        PlayerPrefs.SetFloat("LastRainVolume", rain.volume);
     }
 }

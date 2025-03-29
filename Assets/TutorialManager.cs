@@ -19,13 +19,16 @@ public class TutorialManager : MonoBehaviour
 [SerializeField] GameObject swipeObject;
 [SerializeField] TMP_Text swipeText;
 
+[SerializeField] GameObject soundManager;
 
     
     int tutorialState = 0;
-
+AudioSource rain;
     private bool checkSwipe;
 
     void Awake(){
+                rain = soundManager.GetComponent<SoundManager>().sounds[1].soundChildren.GetComponent<AudioSource>();
+
    string tutorialFinished = PlayerPrefs.GetString("TutorialPlayed");
 
 if(tutorialFinished.Equals("Yes")){
@@ -36,7 +39,7 @@ if(tutorialFinished.Equals("Yes")){
 
     void Start(){
 
-
+        rain.mute = true;
         checkSwipe = true;
         player.GetComponent<PlayerMovement>().canDownSwipe = false;
           player.GetComponent<PlayerMovement>().canLeftSwipe = false;
@@ -159,6 +162,7 @@ if(this!=null){
                     levelSand.GetComponent<PopUp>().hidePopUp();
                     levelManager.createField.drawField(levelManager.grassMaterial);
                     levelManager.setRainForLevel(0,true); 
+                    rain.mute = false;
                     tutorialState =9;
                     });
                 
