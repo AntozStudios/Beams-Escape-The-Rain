@@ -1,0 +1,2 @@
+C:\Users\haupt\Documents\GitHub\Beams-Escape-The-Rain\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
+C:\Users\haupt\Documents\GitHub\Beams-Escape-The-Rain\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\FramePacing\CMakeLists.txt

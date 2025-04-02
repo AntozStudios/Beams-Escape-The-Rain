@@ -297,11 +297,12 @@ while(remainingAngle>0){
     float rotationAngle = Mathf.Min(Time.deltaTime*speed,remainingAngle);
     transform.RotateAround(rotationCenter,rotationAxis,rotationAngle);
     remainingAngle-=rotationAngle;
+   
 yield return null;
 }
 
 canMove = true;
-transform.rotation = Quaternion.identity;
+
     
 
 }

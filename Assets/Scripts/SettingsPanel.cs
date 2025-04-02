@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.UI;
@@ -38,39 +39,46 @@ public class SettingsPanel : MonoBehaviour
 
     }
 
+//RainVolumeChanged
+//LastRainVolume
     void Start()
     {
         ///////////////////
         
+         string tutorialFinished = PlayerPrefs.GetString("TutorialPlayed");
 
-  float tempRainValue = PlayerPrefs.GetFloat("LastRainVolume");
-        if (tempRainValue > 0)
-        {
-            rain.volume = tempRainValue;
-            rainSlider.value = tempRainValue;
-            rainValueText.text = PlayerPrefs.GetFloat("LastRainVolume").ToString("F2");
-        }
-        else
-        {
-            rain.volume = rainSlider.value;
-            rainValueText.text = rainSlider.value.ToString("F2");
-        }
+   
 
 
 
-        //////////////////
-        float tempMusicValue = PlayerPrefs.GetFloat("LastMusicVolume");
-        if (tempMusicValue > 0)
-        {
-            music.volume = tempMusicValue;
-            musicSlider.value = tempMusicValue;
-            musicValueText.text = PlayerPrefs.GetFloat("LastMusicVolume").ToString("F2");
-        }
-        else
-        {
-            music.volume = musicSlider.value;
-            musicValueText.text = musicSlider.value.ToString("F2");
-        }
+////////////////////////////////////////////////////////////////////////
+float tempRainVolume = PlayerPrefs.GetFloat("LastRainVolume");
+int tempVolumeRain_Changed = PlayerPrefs.GetInt("VolumeRain_Changed");
+if(tempVolumeRain_Changed==0){
+rain.volume = rainSlider.value; // Default value by Slider
+}else{
+    rain.volume = tempRainVolume; // Saved value
+    rainSlider.value = tempRainVolume;
+}
+
+rainValueText.text = rainSlider.value.ToString("F2");
+/////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+float tempMusicVolume = PlayerPrefs.GetFloat("LastMusicVolume");
+int tempVolumeMusic_Changed = PlayerPrefs.GetInt("VolumeMusic_Changed");
+if(tempVolumeMusic_Changed==0){
+music.volume = musicSlider.value; // Default value by Slider
+}else{
+    music.volume = tempMusicVolume; // Saved value
+    musicSlider.value = tempMusicVolume;
+}
+
+musicValueText.text = musicSlider.value.ToString("F2");
+/////////////////////////////////////////////////////////////////////
+         
+
+
 
 
         followPlayer = Camera.main.GetComponent<FollowPlayer>();
@@ -95,23 +103,25 @@ public class SettingsPanel : MonoBehaviour
 
         followPlayerSlider.onValueChanged.AddListener((value) => changedSliderFollowPlayer());
 
+        int tempValueVignette_Changed = PlayerPrefs.GetInt("ValueVignette_Changed");
+
+        
 
         float tempPostProcessValue = PlayerPrefs.GetFloat("LastProcessingValue");
 
         if (postProcessingVolume.profile.TryGetSettings<Vignette>(out vignette))
         {
-            if (tempPostProcessValue > 0)
-            {
-                vignette.intensity.value = tempPostProcessValue;
-                postProcessingSlider.value = tempPostProcessValue;
-                postProcessSliderValue.text = PlayerPrefs.GetFloat("LastProcessingValue").ToString("F1");
-            }
-            else
-            {
-                vignette.intensity.value = postProcessingSlider.value;
-                postProcessSliderValue.text = postProcessingSlider.value.ToString("F1");
-            }
+       if(tempValueVignette_Changed==0){
+    vignette.intensity.value = postProcessingSlider.value;
+      postProcessSliderValue.text = PlayerPrefs.GetFloat("LastProcessingValue").ToString("F1");
+        }else{
+            float tempLastVolume = PlayerPrefs.GetFloat("LastProcessingValue");
+            vignette.intensity.value = tempLastVolume;
+          
 
+        }
+  postProcessingSlider.value = vignette.intensity.value;      
+  postProcessSliderValue.text = vignette.intensity.value.ToString("F1");
 
 
         }
@@ -154,6 +164,7 @@ public class SettingsPanel : MonoBehaviour
             vignette.intensity.value = postProcessingSlider.value;
             PlayerPrefs.SetFloat("LastProcessingValue", vignette.intensity.value);
             postProcessSliderValue.text = vignette.intensity.value.ToString("F1");
+            PlayerPrefs.SetInt("ValueVignette_Changed",1);
         }
     }
 
@@ -161,12 +172,16 @@ public class SettingsPanel : MonoBehaviour
     {
         music.volume = musicSlider.value;
         musicValueText.text = musicSlider.value.ToString("F2");
-        PlayerPrefs.SetFloat("LastMusicVolume", music.volume);
+        PlayerPrefs.SetFloat("LastMusicVolume", musicSlider.value);
+        PlayerPrefs.SetInt("VolumeMusic_Changed",1);
+       
     }
      void changeVolume_Rain()
     {
         rain.volume = rainSlider.value;
         rainValueText.text = rainSlider.value.ToString("F2");
-        PlayerPrefs.SetFloat("LastRainVolume", rain.volume);
+        PlayerPrefs.SetFloat("LastRainVolume", rainSlider.value);
+        PlayerPrefs.SetInt("VolumeRain_Changed",1);
+
     }
 }

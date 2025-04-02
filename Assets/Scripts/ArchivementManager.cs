@@ -21,7 +21,7 @@ public class ArchivementManager : MonoBehaviour
 
     public static ArchivementManager Instance;
 
-
+ 
     [SerializeField] GameObject inspectorCamera_Prefab;
 
     [SerializeField] GameObject inspectorPanel;
@@ -60,7 +60,7 @@ public class ArchivementManager : MonoBehaviour
     }
 
 void Start(){
-     initItems(0); 
+     
 }
 
         public void ResetSavedItems()
@@ -87,7 +87,7 @@ void Start(){
         }
     }
 
-    void initItems(int index)
+ public   void initItems(int index)
     {
 
         
@@ -107,7 +107,7 @@ void Start(){
 
 
                 GameObject itemViewer = temp.transform.Find("ItemViewer").gameObject;
-             GameObject   currentCamera = Instantiate(inspectorCamera_Prefab,itemViewer.transform);
+               GameObject currentCamera = Instantiate(inspectorCamera_Prefab,itemViewer.transform);
                 
                 currentCamera.GetComponent<Camera>().targetTexture = new RenderTexture(1024,1024,64);
                 itemViewer.GetComponent<RawImage>().texture = currentCamera.GetComponent<Camera>().targetTexture;
@@ -252,6 +252,8 @@ void Start(){
 
 public void openInspectorPanel(GameObject tempCamera,RawImage rw){
 
+
+
 if(inspectorPopUp==null){
    
 inspectorPopUp =  Instantiate(inspectorPanel);
@@ -262,21 +264,30 @@ inspectorPopUp =  Instantiate(inspectorPanel);
 GameObject background = inspectorPopUp.transform.Find("Background").gameObject;
 GameObject mainPanel = background.transform.Find("MainPanel").gameObject;
 GameObject button = mainPanel.transform.Find("Button").gameObject;
-button.gameObject.GetComponent<Button>().onClick.AddListener(()=> rotateCube(tempCamera,0,0));
+
+
+
 GameObject rawImage = background.transform.Find("RawImage").gameObject;
 GameObject left = rawImage.transform.Find("Left").gameObject;
 GameObject right = rawImage.transform.Find("Right").gameObject;
 GameObject down = rawImage.transform.Find("Down").gameObject;
 GameObject up = rawImage.transform.Find("Up").gameObject;
+
+button.gameObject.GetComponent<Button>().onClick.AddListener(()=>
+{ 
+rotateCube(tempCamera,0,0);
+left.GetComponent<Button>().onClick.RemoveAllListeners();
+right.GetComponent<Button>().onClick.RemoveAllListeners();
+up.GetComponent<Button>().onClick.RemoveAllListeners();
+down.GetComponent<Button>().onClick.RemoveAllListeners();
+}
+);
+rawImage.GetComponent<RawImage>().texture = rw.texture;
+
 left.GetComponent<Button>().onClick.AddListener(()=> rotateCube(tempCamera,0,45));
 right.GetComponent<Button>().onClick.AddListener(()=> rotateCube(tempCamera,0,-45));
-
-
-
 up.GetComponent<Button>().onClick.AddListener(()=> rotateCube(tempCamera,45,0));
 down.GetComponent<Button>().onClick.AddListener(()=> rotateCube(tempCamera,-45,0));
-
-rawImage.GetComponent<RawImage>().texture = rw.texture;
 inspectorPopUp.GetComponent<PopUp>().showPopUp();
 
 
@@ -284,22 +295,20 @@ inspectorPopUp.GetComponent<PopUp>().showPopUp();
 
 }
 
-void rotateCube(GameObject tempCube, int x, int y)
+void rotateCube(GameObject tempCamera, int x, int y)
 {
-    if(tempCube!=null){
-GameObject cube = tempCube.transform.Find("Cube").gameObject;
+
+GameObject cube = tempCamera.transform.Find("Cube").gameObject;
 
 if(x ==0  && y == 0){
-cube.transform.rotation = Quaternion.identity;
+cube.transform.rotation = new Quaternion(0,0,180,0);
+
 }else{
 cube.transform.Rotate(x, y, 0, Space.World);
 
-
-    }
     }
     
    
-
 
 
 
@@ -311,6 +320,7 @@ cube.transform.Rotate(x, y, 0, Space.World);
 
 
 
+ 
 
 
 }

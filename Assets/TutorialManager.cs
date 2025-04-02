@@ -128,7 +128,7 @@ if(this!=null){
                 swipeText.text ="";
                 swipeObject.SetActive(false);
                 GameObject levelGrass = Instantiate(nextPrefab,transform);
-                levelGrass.GetComponent<PopUp>().content.text ="You have to keep moving, you can't stay still for long.       Grass: Max 6 seconds before you die.";
+                levelGrass.GetComponent<PopUp>().content.text ="You have to keep moving, you can't stay still for long. Grass: Max 6 seconds before you die.";
                 levelGrass.GetComponent<PopUp>().showPopUp();
                 levelGrass.GetComponent<PopUp>().nextButton.onClick.AddListener(()=> {
                     
@@ -162,13 +162,14 @@ if(this!=null){
                     levelSand.GetComponent<PopUp>().hidePopUp();
                     levelManager.createField.drawField(levelManager.grassMaterial);
                     levelManager.setRainForLevel(0,true); 
+                    
                     rain.mute = false;
                     tutorialState =9;
                     });
                 
             }else if(tutorialState==9){
                 GameObject rainTutorial = Instantiate(nextPrefab,transform);
-                rainTutorial.GetComponent<PopUp>().content.text="Each level has a unique rain pattern.    The pattern stays the same after respawning, but be careful – you must dodge the red rain!";
+                rainTutorial.GetComponent<PopUp>().content.text="Each level has a unique rain pattern. The pattern stays the same after respawning, but be careful – you must dodge the red rain!";
                 rainTutorial.GetComponent<PopUp>().showPopUp();
                 rainTutorial.GetComponent<PopUp>().nextButton.onClick.AddListener(()=> {
                     

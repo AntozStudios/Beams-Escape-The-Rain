@@ -488,6 +488,7 @@ MonoBehaviour:
   nextPrefab: {fileID: 8661835107065473513, guid: ed0ad946abc45714b872f07d62b42926, type: 3}
   swipeObject: {fileID: 1388863701}
   swipeText: {fileID: 755086010}
+  soundManager: {fileID: 57127394}
 --- !u!4 &430159362
 Transform:
   m_ObjectHideFlags: 0
@@ -3659,6 +3660,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 4275203097097287281}
+        m_TargetAssemblyTypeName: ArchivementManager, Assembly-CSharp
+        m_MethodName: initItems
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1889653231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4415,7 +4428,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6083263701691326560}
   m_HandleRect: {fileID: 6254456665683754253}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4713,7 +4726,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.000011444092, y: 17.332682}
+  m_AnchoredPosition: {x: 0.000011444092, y: 16.040215}
   m_SizeDelta: {x: 0, y: 220.529}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1147453737616094930
@@ -4898,8 +4911,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3555650069553352476}
   m_HandleRect: {fileID: 3836808970997818435}
   m_Direction: 2
-  m_Value: -0.080645435
-  m_Size: 0.9011313
+  m_Value: -0.00006183786
+  m_Size: 0.9264591
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6541,68 +6554,128 @@ MonoBehaviour:
     color: {r: 0, g: 0, b: 0, a: 0}
     _gameObject: {fileID: 0}
     itemCategory: 0
-    itemName: Default Cube
+    itemName: Default
     levelToUnlock: 0
   - material: {fileID: 2100000, guid: c7e9c542c6375e14da946aa939258c12, type: 2}
     color: {r: 0, g: 0, b: 0, a: 0}
     _gameObject: {fileID: 0}
     itemCategory: 0
-    itemName: Red Cube
-    levelToUnlock: 40
+    itemName: Red
+    levelToUnlock: 5
   - material: {fileID: 2100000, guid: adf69f8ba56772a479e2b03ca2227f3f, type: 2}
     color: {r: 0, g: 0, b: 0, a: 0}
     _gameObject: {fileID: 0}
     itemCategory: 0
-    itemName: Golden Cube
-    levelToUnlock: 100
+    itemName: Yellow
+    levelToUnlock: 10
   - material: {fileID: 0}
     color: {r: 0.12156863, g: 0.12156863, b: 0.12156863, a: 1}
     _gameObject: {fileID: 0}
     itemCategory: 1
-    itemName: Default Sky
+    itemName: Default
     levelToUnlock: 0
   - material: {fileID: 0}
     color: {r: 0, g: 0.17660381, b: 0.2830189, a: 1}
     _gameObject: {fileID: 0}
     itemCategory: 1
-    itemName: Blue Sky
-    levelToUnlock: 25
+    itemName: Blue
+    levelToUnlock: 5
   - material: {fileID: 0}
     color: {r: 0.18867922, g: 0, b: 0.0049008057, a: 1}
     _gameObject: {fileID: 0}
     itemCategory: 1
-    itemName: Red Sky
-    levelToUnlock: 50
+    itemName: Red
+    levelToUnlock: 10
   - material: {fileID: 0}
     color: {r: 0.3018868, g: 0, b: 0.17330544, a: 1}
     _gameObject: {fileID: 0}
     itemCategory: 1
-    itemName: Purple Sky
-    levelToUnlock: 35
+    itemName: Purple
+    levelToUnlock: 15
   - material: {fileID: 2100000, guid: 85a4262bbefdcea45b2938dc28819069, type: 2}
     color: {r: 1, g: 1, b: 1, a: 0}
     _gameObject: {fileID: 0}
     itemCategory: 0
-    itemName: Green Cube
-    levelToUnlock: 75
+    itemName: Green
+    levelToUnlock: 15
   - material: {fileID: 0}
     color: {r: 0.003921569, g: 0.003921569, b: 0.003921569, a: 1}
     _gameObject: {fileID: 0}
     itemCategory: 1
-    itemName: Black Sky
-    levelToUnlock: 10
+    itemName: Black
+    levelToUnlock: 20
   - material: {fileID: 0}
     color: {r: 0.5471698, g: 0.52946204, b: 0, a: 1}
     _gameObject: {fileID: 0}
     itemCategory: 1
-    itemName: Yellow Sky
-    levelToUnlock: 5
+    itemName: Yellow
+    levelToUnlock: 25
   - material: {fileID: 0}
     color: {r: 0.14418045, g: 0.4056604, b: 0, a: 1}
     _gameObject: {fileID: 0}
     itemCategory: 1
-    itemName: Green Sky
-    levelToUnlock: 15
+    itemName: Green
+    levelToUnlock: 30
+  - material: {fileID: 2100000, guid: c1502bd460c689f41875c234a06a31ae, type: 2}
+    color: {r: 0.14418045, g: 0.4056604, b: 0, a: 1}
+    _gameObject: {fileID: 0}
+    itemCategory: 0
+    itemName: Blue
+    levelToUnlock: 20
+  - material: {fileID: 2100000, guid: 2becd9d12bc33f946ada4de3fc48788a, type: 2}
+    color: {r: 0.14418045, g: 0.4056604, b: 0, a: 1}
+    _gameObject: {fileID: 0}
+    itemCategory: 0
+    itemName: Violet
+    levelToUnlock: 25
+  - material: {fileID: 2100000, guid: 03bbabf6a86e8774ba9da69f50a8d529, type: 2}
+    color: {r: 0.14418045, g: 0.4056604, b: 0, a: 1}
+    _gameObject: {fileID: 0}
+    itemCategory: 0
+    itemName: Magenta
+    levelToUnlock: 30
+  - material: {fileID: 2100000, guid: 8a0216f2a706997448af35f13d5849ed, type: 2}
+    color: {r: 0.14418045, g: 0.4056604, b: 0, a: 1}
+    _gameObject: {fileID: 0}
+    itemCategory: 0
+    itemName: Italy
+    levelToUnlock: 5
+  - material: {fileID: 2100000, guid: 9452e30cca6863041bd3333530db776f, type: 2}
+    color: {r: 0.14418045, g: 0.4056604, b: 0, a: 1}
+    _gameObject: {fileID: 0}
+    itemCategory: 0
+    itemName: Germany
+    levelToUnlock: 5
+  - material: {fileID: 2100000, guid: 731756e40e51f044da01ee1cc36b8a9d, type: 2}
+    color: {r: 0.14418045, g: 0.4056604, b: 0, a: 1}
+    _gameObject: {fileID: 0}
+    itemCategory: 0
+    itemName: USA
+    levelToUnlock: 5
+  - material: {fileID: 2100000, guid: 3c22a20e1a2092449961a273bdc37710, type: 2}
+    color: {r: 0.14418045, g: 0.4056604, b: 0, a: 1}
+    _gameObject: {fileID: 0}
+    itemCategory: 0
+    itemName: India
+    levelToUnlock: 5
+  - material: {fileID: 2100000, guid: 86e954bfae03b594485b67b8f2a6e6ad, type: 2}
+    color: {r: 0.14418045, g: 0.4056604, b: 0, a: 1}
+    _gameObject: {fileID: 0}
+    itemCategory: 0
+    itemName: England
+    levelToUnlock: 5
+  - material: {fileID: 2100000, guid: 434d440055030e14797c3ec2d6992d2c, type: 2}
+    color: {r: 0.14418045, g: 0.4056604, b: 0, a: 1}
+    _gameObject: {fileID: 0}
+    itemCategory: 0
+    itemName: China
+    levelToUnlock: 5
+  - material: {fileID: 2100000, guid: 2c9211477e91a9247bb05f5090e2ce81, type: 2}
+    color: {r: 0.14418045, g: 0.4056604, b: 0, a: 1}
+    _gameObject: {fileID: 0}
+    itemCategory: 0
+    itemName: netherlands
+    levelToUnlock: 5
 --- !u!1 &4306007871698010528
 GameObject:
   m_ObjectHideFlags: 0
@@ -12676,7 +12749,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Watch an (1X Life)
+  m_text: Watch an Ad (1X Life)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e46df789b12aecd4c82b64b170dbb446, type: 2}
   m_sharedMaterial: {fileID: -5631600966435474730, guid: e46df789b12aecd4c82b64b170dbb446, type: 2}
@@ -23599,7 +23672,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 357828657388793727, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
       propertyPath: m_Value
-      value: 0.025
+      value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 357828657388793727, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
       propertyPath: m_MaxValue
@@ -23615,7 +23688,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1223636590471524047, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 9.239128
+      value: -0.0000076293945
       objectReference: {fileID: 0}
     - target: {fileID: 1286974240587601285, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
       propertyPath: m_Value
@@ -23653,13 +23726,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4922076130650092573, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922076130650092573, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922076130650092573, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5109422070905632549, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
       propertyPath: m_Value
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5109422070905632549, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
       propertyPath: m_MinValue
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5227115214937870264, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
       propertyPath: m_AnchorMax.x
@@ -23800,6 +23885,14 @@ PrefabInstance:
     - target: {fileID: 6231819386059443295, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6696499050188425085, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6696499050188425085, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6945358653196553947, guid: 46747d5b321ea7e41a5b5bee33190ba3, type: 3}
       propertyPath: m_AnchorMax.x
