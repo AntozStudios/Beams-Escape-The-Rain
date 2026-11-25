@@ -1,0 +1,13 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.antoz.beams">
+  <application>
+    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-1320039869895590~7544100097"/>
+    <activity android:name="com.antoz.beams.LoginCallback" android:exported="true" android:noHistory="true" android:theme="@android:style/Theme.NoDisplay">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW"/>
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
+        <data android:scheme="unitydl" android:host="com.unityplayeraccounts.ee68dd81-e71c-4d23-9eb4-6be970f92a12"/>
+      </intent-filter>
+    </activity>
+  </application>
+</manifest>

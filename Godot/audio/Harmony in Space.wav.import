@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bwsktgt24e02a"
+path="res://.godot/imported/Harmony in Space.wav-70904b2071fa92e119c16fcb25634eeb.sample"
+
+[deps]
+
+source_file="res://audio/Harmony in Space.wav"
+dest_files=["res://.godot/imported/Harmony in Space.wav-70904b2071fa92e119c16fcb25634eeb.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

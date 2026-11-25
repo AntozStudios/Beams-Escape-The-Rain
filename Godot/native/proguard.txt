@@ -1,0 +1,2 @@
+-keep class com.antoz.beams.BeamsMobile { public static *; }
+-keep class com.antoz.beams.LoginCallback { *; }
