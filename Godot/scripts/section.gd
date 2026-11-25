@@ -12,6 +12,7 @@ const GRACE := [2.0, 4.0, 6.0]
 var terrain: int
 var map_id: int
 var mirrored: bool
+var variation: int
 var landing_heights := PackedFloat32Array()
 var player: MeshInstance3D
 var checkpoint: MeshInstance3D
@@ -35,7 +36,7 @@ static func box(parent: Node3D, center: Vector3, dimensions: Vector3, color: Col
 	return body
 
 func elevation(cell: Vector2i) -> int:
-	return Maps.elevation(map_id,cell,mirrored)
+	return Maps.elevation(map_id,cell,mirrored,variation)
 
 func surface_y(cell: Vector2i) -> float:
 	return position.y + GROUND + elevation(cell)
@@ -44,6 +45,7 @@ func build(index: int, surface: int, actor: MeshInstance3D, layout: int = Maps.C
 	player = actor
 	terrain = surface
 	map_id = layout
+	variation = index % 3
 	mirrored = index % 2 == 1
 	position.z = -index * LENGTH
 	rng.reset(index)

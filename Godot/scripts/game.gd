@@ -6,6 +6,8 @@ const Profile := preload("res://scripts/profile.gd")
 const Mobile := preload("res://scripts/mobile.gd")
 const ROLL_TIME := 90.0 / 800.0
 const START := Vector3(0,-3.5,3.5)
+const CAMERA_OFFSET := Vector3(-19.61,24.5,24.5)
+const DOWNHILL_VIEW := deg_to_rad(65.0)
 var profile := Profile.new()
 var mobile := Mobile.new()
 var player: MeshInstance3D
@@ -29,11 +31,16 @@ var direction: Vector3
 var rise := 0.0
 var move_time := ROLL_TIME
 var touch_origin: Vector2
+var touch_view: Basis
 var touch_index := -1
 var music: AudioStreamPlayer
 var ambience: AudioStreamPlayer
 @onready var ui = $Interface
 @onready var camera: Camera3D = $Camera
+@onready var home_yaw := camera.rotation.y
+@onready var camera_focus := camera.position - CAMERA_OFFSET
+var orbit := 0.0
+var target_orbit := 0.0
 
 func _ready() -> void:
 	add_child(mobile)
@@ -58,6 +65,7 @@ func _ready() -> void:
 	sunlight.visible = map_id != Maps.CLASSIC
 	add_section()
 	player.position.y = sections.back().surface_y(cell) + 0.5
+	update_descent_view()
 	music = play("Harmony in Space",float(profile.value("Music",0.025)),true)
 	ambience = play("rain1",0.5,true)
 	apply_settings()
@@ -130,26 +138,38 @@ func select_map(id: int) -> void:
 	add_section()
 	player.position.y = sections.back().surface_y(cell) + 0.5
 	sunlight.visible = id != Maps.CLASSIC
+	update_descent_view()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not armed or dead or ui.modal_visible():
 		return
 	if event is InputEventKey and not event.pressed and not event.echo:
-		var keys := {KEY_LEFT:Vector2i.LEFT,KEY_RIGHT:Vector2i.RIGHT,KEY_UP:Vector2i.DOWN,KEY_DOWN:Vector2i.UP}
+		var keys := {KEY_LEFT:Vector2.LEFT,KEY_RIGHT:Vector2.RIGHT,KEY_UP:Vector2.UP,KEY_DOWN:Vector2.DOWN}
 		if keys.has(event.keycode):
-			move(keys[event.keycode])
+			move(screen_step(keys[event.keycode],camera.global_basis))
 	elif event is InputEventScreenTouch:
 		if event.pressed and touch_index == -1:
 			touch_index = event.index
 			touch_origin = event.position
+			touch_view = camera.global_basis
 		elif not event.pressed and event.index == touch_index:
 			touch_index = -1
 			var swipe: Vector2 = event.position - touch_origin
 			if get_viewport().get_screen_transform().basis_xform(swipe).length() >= 100:
-				if absf(swipe.x) > absf(swipe.y):
-					move(Vector2i(signi(int(swipe.x)),0))
-				else:
-					move(Vector2i(0,-signi(int(swipe.y))))
+				move(screen_step(swipe,touch_view))
+
+# Match the input to the on-screen direction of each horizontal grid edge.
+func screen_step(input_direction: Vector2, view: Basis) -> Vector2i:
+	var best := Vector2i.ZERO
+	var best_alignment := -INF
+	for step: Vector2i in [Vector2i.DOWN, Vector2i.RIGHT, Vector2i.UP, Vector2i.LEFT]:
+		var edge := Vector3(step.x,0,-step.y)
+		var screen_edge := Vector2(edge.dot(view.x),-edge.dot(view.y)).normalized()
+		var alignment := input_direction.dot(screen_edge)
+		if alignment > best_alignment:
+			best_alignment = alignment
+			best = step
+	return best
 
 func move(step: Vector2i) -> void:
 	if dead or not armed or locked_until > 0 or roll_elapsed < move_time:
@@ -170,6 +190,9 @@ func move(step: Vector2i) -> void:
 	origin = player.position
 	roll_elapsed = 0
 	started = true
+	# Hold the preview while the cube rolls down the step it revealed.
+	if not (step == Vector2i.DOWN and rise < 0):
+		update_descent_view()
 	idle = 0
 	play("player",0.11)
 	ui.refresh()
@@ -201,6 +224,7 @@ func _physics_process(delta: float) -> void:
 				play("checkPoint",0.11)
 				add_section()
 				ui.refresh()
+			update_descent_view()
 	if started:
 		idle += delta
 		var grace: float = Section.GRACE[sections.back().terrain]
@@ -208,12 +232,42 @@ func _physics_process(delta: float) -> void:
 		if idle >= 3 + grace:
 			die()
 
+func update_descent_view() -> void:
+	var section: Section = sections.back()
+	var ahead := cell + Vector2i.DOWN
+	if map_id == Maps.CLASSIC or cell.y < 0 or ahead.y >= Section.LENGTH:
+		target_orbit = 0.0
+		return
+	if section.elevation(cell) - section.elevation(ahead) != 1:
+		target_orbit = 0.0
+		return
+
+	# Inspect the two approaches to the landing. Nearer columns obstruct more.
+	var obstruction := 0
+	for distance in range(1,4):
+		for row in range(cell.y,ahead.y+1):
+			for side in [-1,1]:
+				var probe := Vector2i(cell.x + side*distance,row)
+				if absi(probe.x) > 3:
+					continue
+				var relief := section.elevation(probe) - section.elevation(ahead)
+				obstruction += side * (4-distance) * maxi(0,relief+1)
+	var view_side := -signi(obstruction)
+	if view_side == 0:
+		view_side = signi(cell.x)
+		if view_side == 0:
+			view_side = 1 if section.mirrored else -1
+	target_orbit = view_side * DOWNHILL_VIEW - home_yaw
+
 func _process(delta: float) -> void:
-	var target := Vector3(player.position.x-19.61,21,player.position.z+24.5)
-	if map_id != Maps.CLASSIC:
-		target.y += player.position.y - START.y
+	var target := player.position
+	if map_id == Maps.CLASSIC:
+		target.y = START.y
 	var follow := float(profile.value("Follow Player",1))
-	camera.position = camera.position.lerp(target,clampf(delta*follow,0,1)) if follow > 0 else target
+	camera_focus = camera_focus.lerp(target,clampf(delta*follow,0,1)) if follow > 0 else target
+	orbit = lerp_angle(orbit,target_orbit,1.0-exp(-5.0*delta))
+	camera.position = camera_focus + CAMERA_OFFSET.rotated(Vector3.UP,orbit)
+	camera.rotation.y = home_yaw + orbit
 
 func burst(point: Vector3, color: Color, count: int) -> void:
 	var particles := CPUParticles3D.new()
@@ -273,6 +327,7 @@ func revive(amount: int) -> void:
 	player.transform = Transform3D(Basis.IDENTITY,START + sections.back().position)
 	player.position.y = sections.back().surface_y(cell) + 0.5
 	roll_elapsed = move_time
+	update_descent_view()
 	locked_until = 0
 	idle = 0
 	player.show()
