@@ -11,6 +11,7 @@ var game
 var root := Control.new()
 var navigation := VBoxContainer.new()
 var start := Button.new()
+var map_picker := OptionButton.new()
 var life := Label.new()
 var score := Label.new()
 var warning := Label.new()
@@ -43,6 +44,17 @@ func setup(owner_game) -> void:
 	start.flat = true
 	start.add_theme_font_size_override("font_size",28)
 	start.pressed.connect(func(): game.armed = true; refresh())
+	root.add_child(map_picker)
+	map_picker.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	map_picker.offset_left = -145
+	map_picker.offset_right = 145
+	map_picker.offset_top = 36
+	map_picker.offset_bottom = 84
+	for i in game.Maps.NAMES.size():
+		map_picker.add_item("%s · %s" % [game.Maps.NAMES[i],game.Maps.DIFFICULTY[i]],i)
+	map_picker.select(game.map_id)
+	map_picker.item_selected.connect(game.select_map)
+	map_picker.focus_mode = Control.FOCUS_NONE
 	root.add_child(navigation)
 	navigation.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	navigation.offset_left = -74
@@ -96,6 +108,7 @@ func refresh() -> void:
 	score.text = str(game.level)
 	score.visible = game.started and not game.dead
 	start.visible = not game.armed
+	map_picker.visible = not game.armed
 	navigation.visible = not game.started
 	if game.dead or not game.started:
 		warning.text = ""
@@ -167,7 +180,7 @@ func close() -> void:
 
 func instructions() -> void:
 	panel("")
-	label(content,"Movement:\nSwipe in any direction to move the player.\n\nRain:\nRed rain: Avoid it – it's deadly!\n\nGround timer:\nStanding still will kill you!\nGrass: Max 6 seconds\nIce: Max 4 seconds\nSand: Max 2 seconds\n\nRewards:\nWatch up to 3 ads per game to receive 1 life each.")
+	label(content,"Movement:\nSwipe in any direction to move the player. On mountain maps you can climb or descend one block per swipe. Find a way around taller cliffs.\n\nRain:\nRed rain: Avoid it – it's deadly!\n\nGround timer:\nStanding still will kill you!\nGrass: Max 6 seconds\nIce: Max 4 seconds\nSand: Max 2 seconds\n\nRewards:\nWatch up to 3 ads per game to receive 1 life each.")
 	exit_button(close_animated)
 
 func settings() -> void:

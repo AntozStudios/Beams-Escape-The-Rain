@@ -1,6 +1,7 @@
 extends Node3D
 
 const Section := preload("res://scripts/section.gd")
+const Maps := preload("res://scripts/maps.gd")
 const Profile := preload("res://scripts/profile.gd")
 const Mobile := preload("res://scripts/mobile.gd")
 const ROLL_TIME := 90.0 / 800.0
@@ -11,6 +12,8 @@ var player: MeshInstance3D
 var lamp := OmniLight3D.new()
 var environment := Environment.new()
 var sections: Array[Section] = []
+var map_id := Maps.CLASSIC
+var sunlight := DirectionalLight3D.new()
 var level := 0
 var lives := 3
 var revivals := 0
@@ -23,6 +26,8 @@ var locked_until := 0.0
 var roll_elapsed := ROLL_TIME
 var origin: Vector3
 var direction: Vector3
+var rise := 0.0
+var move_time := ROLL_TIME
 var touch_origin: Vector2
 var touch_index := -1
 var music: AudioStreamPlayer
@@ -46,7 +51,13 @@ func _ready() -> void:
 	lamp.light_energy = 1.47
 	lamp.omni_range = 6.44
 	create_stars()
+	map_id = clampi(int(profile.value("map",Maps.CLASSIC)),0,Maps.NAMES.size()-1)
+	add_child(sunlight)
+	sunlight.rotation_degrees = Vector3(-55,-30,0)
+	sunlight.light_energy = 0.85
+	sunlight.visible = map_id != Maps.CLASSIC
 	add_section()
+	player.position.y = sections.back().surface_y(cell) + 0.5
 	music = play("Harmony in Space",float(profile.value("Music",0.025)),true)
 	ambience = play("rain1",0.5,true)
 	apply_settings()
@@ -95,16 +106,30 @@ func apply_settings() -> void:
 	ui.set_vignette(float(profile.value("Vignette",0.5)))
 
 func add_section() -> void:
-	var surface := 2
-	if not sections.is_empty():
+	var surface: int = Maps.SURFACES[map_id]
+	if map_id == Maps.CLASSIC and not sections.is_empty():
 		surface = (sections.back().rng.next_word() % 4) % 3
 	var section := Section.new()
 	add_child(section)
-	section.build(level,surface,player)
+	section.build(level,surface,player,map_id)
+	if not sections.is_empty():
+		section.position.y = sections.back().surface_y(Vector2i(0,7)) - section.surface_y(Vector2i.ZERO)
 	section.hit.connect(on_hit)
 	sections.append(section)
 	if sections.size() > 3:
 		sections.pop_front().queue_free()
+
+func select_map(id: int) -> void:
+	if started or dead or id == map_id or id < 0 or id >= Maps.NAMES.size():
+		return
+	map_id = id
+	profile.save("map",id)
+	var previous: Section = sections.pop_back()
+	remove_child(previous)
+	previous.queue_free()
+	add_section()
+	player.position.y = sections.back().surface_y(cell) + 0.5
+	sunlight.visible = id != Maps.CLASSIC
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not armed or dead or ui.modal_visible():
@@ -127,11 +152,19 @@ func _unhandled_input(event: InputEvent) -> void:
 					move(Vector2i(0,-signi(int(swipe.y))))
 
 func move(step: Vector2i) -> void:
-	if dead or not armed or locked_until > 0 or roll_elapsed < ROLL_TIME:
+	if dead or not armed or locked_until > 0 or roll_elapsed < move_time:
 		return
 	var next := cell + step
 	if absi(next.x) > 3 or (step.y != 0 and (next.y < 0 or next.y > 7)):
 		return
+	var target_section: Section = sections.back()
+	if next.y == -1:
+		target_section = sections[-2]
+	var target_row := 7 if next.y == -1 else next.y
+	rise = target_section.surface_y(Vector2i(next.x,target_row)) + 0.5 - player.position.y
+	if absf(rise) > 1.01:
+		return
+	move_time = ROLL_TIME if is_zero_approx(rise) else ROLL_TIME * 2
 	cell = next
 	direction = Vector3(step.x,0,-step.y)
 	origin = player.position
@@ -145,14 +178,21 @@ func _physics_process(delta: float) -> void:
 	if dead:
 		return
 	locked_until = maxf(0,locked_until-delta)
-	if roll_elapsed < ROLL_TIME:
-		roll_elapsed = minf(ROLL_TIME,roll_elapsed+delta)
+	if roll_elapsed < move_time:
+		roll_elapsed = minf(move_time,roll_elapsed+delta)
+		var roll_phase := roll_elapsed / ROLL_TIME
+		var lift := 0.0
+		if rise > 0:
+			lift = rise * smoothstep(0,1,roll_phase)
+			roll_phase -= 1
+		elif rise < 0:
+			lift = rise * smoothstep(1,2,roll_phase)
 		var pivot := origin + (direction + Vector3.DOWN)*0.5
 		var rotation_axis := Vector3.UP.cross(direction)
-		var rotation_basis := Basis(rotation_axis,PI*0.5*roll_elapsed/ROLL_TIME)
-		player.transform = Transform3D(rotation_basis,pivot+rotation_basis*(origin-pivot))
-		if roll_elapsed >= ROLL_TIME:
-			player.transform = Transform3D(Basis.IDENTITY,origin+direction)
+		var rotation_basis := Basis(rotation_axis,PI*0.5*clampf(roll_phase,0,1))
+		player.transform = Transform3D(rotation_basis,pivot+rotation_basis*(origin-pivot)+Vector3.UP*lift)
+		if roll_elapsed >= move_time:
+			player.transform = Transform3D(Basis.IDENTITY,origin+direction+Vector3.UP*rise)
 			if cell == Vector2i(0,7):
 				sections.back().consume_checkpoint()
 				level += 1
@@ -170,6 +210,8 @@ func _physics_process(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	var target := Vector3(player.position.x-19.61,21,player.position.z+24.5)
+	if map_id != Maps.CLASSIC:
+		target.y += player.position.y - START.y
 	var follow := float(profile.value("Follow Player",1))
 	camera.position = camera.position.lerp(target,clampf(delta*follow,0,1)) if follow > 0 else target
 
@@ -229,7 +271,8 @@ func revive(amount: int) -> void:
 	lives = amount
 	cell = Vector2i.ZERO
 	player.transform = Transform3D(Basis.IDENTITY,START + sections.back().position)
-	roll_elapsed = ROLL_TIME
+	player.position.y = sections.back().surface_y(cell) + 0.5
+	roll_elapsed = move_time
 	locked_until = 0
 	idle = 0
 	player.show()
