@@ -11,7 +11,7 @@ var game
 var root := Control.new()
 var navigation := VBoxContainer.new()
 var start := Button.new()
-var map_picker := OptionButton.new()
+var map_button := Button.new()
 var life := Label.new()
 var score := Label.new()
 var warning := Label.new()
@@ -44,17 +44,15 @@ func setup(owner_game) -> void:
 	start.flat = true
 	start.add_theme_font_size_override("font_size",28)
 	start.pressed.connect(func(): game.armed = true; refresh())
-	root.add_child(map_picker)
-	map_picker.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	map_picker.offset_left = -145
-	map_picker.offset_right = 145
-	map_picker.offset_top = 36
-	map_picker.offset_bottom = 84
-	for i in game.Maps.NAMES.size():
-		map_picker.add_item("%s · %s" % [game.Maps.NAMES[i],game.Maps.DIFFICULTY[i]],i)
-	map_picker.select(game.map_id)
-	map_picker.item_selected.connect(game.select_map)
-	map_picker.focus_mode = Control.FOCUS_NONE
+	root.add_child(map_button)
+	map_button.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	map_button.offset_left = -100
+	map_button.offset_right = 100
+	map_button.offset_top = 78
+	map_button.offset_bottom = 132
+	map_button.text = "Maps"
+	map_button.focus_mode = Control.FOCUS_NONE
+	map_button.pressed.connect(maps)
 	root.add_child(navigation)
 	navigation.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
 	navigation.offset_left = -74
@@ -110,7 +108,7 @@ func refresh() -> void:
 	score.text = str(game.level)
 	score.visible = game.started and not game.dead
 	start.visible = not game.armed
-	map_picker.visible = not game.armed
+	map_button.visible = not game.armed
 	navigation.visible = not game.started
 	if game.dead or not game.started:
 		warning.text = ""
@@ -191,6 +189,20 @@ func settings() -> void:
 	slider("Vignette",0.5,0.01,0.5)
 	slider("Music",0.07,0.001,0.025)
 	exit_button(close_animated)
+
+func maps() -> void:
+	panel("Maps")
+	for i in game.Maps.NAMES.size():
+		var title: String = game.Maps.NAMES[i]
+		var difficulty: String = game.Maps.DIFFICULTY[i]
+		if i == game.map_id:
+			title += "  ✓"
+		button(content,"%s · %s" % [title,difficulty],choose_map.bind(i))
+	exit_button(close_animated)
+
+func choose_map(id: int) -> void:
+	game.select_map(id)
+	close_animated()
 
 func slider(key: String, maximum: float, step: float, fallback: float) -> void:
 	var value := float(game.profile.value(key,fallback))
