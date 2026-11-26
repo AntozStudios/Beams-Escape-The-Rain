@@ -86,7 +86,7 @@ func _ready() -> void:
 	player.position.y = sections.back().surface_y(cell) + 0.5
 	update_descent_view()
 	music = play("Harmony in Space",float(profile.value("Music",0.025)),true)
-	ambience = play("rain1",0.5,true)
+	ambience = play("rain1",0.18,true)
 	apply_settings()
 	ui.setup(self)
 
@@ -95,7 +95,7 @@ func create_stars() -> void:
 	camera.add_child(stars)
 	var viewport_aspect := float(get_viewport().size.x) / maxf(1.0,float(get_viewport().size.y))
 	stars.position = Vector3(0,0,-100)
-	stars.amount = 100
+	stars.amount = 24
 	stars.lifetime = 8
 	stars.gravity = Vector3.ZERO
 	stars.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX

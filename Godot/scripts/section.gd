@@ -17,6 +17,7 @@ const GRACE := [2.0, 4.0, 6.0]
 const HEART := Pickup.Kind.HEART
 const STAR := Pickup.Kind.STAR
 var lift_deck: MeshInstance3D
+var lift_piston: MeshInstance3D
 var pallet: MeshInstance3D
 var pallet_cell := Maps.PALLET_START
 var lift_high := false
@@ -94,8 +95,13 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 			lift_deck = MeshInstance3D.new()
 			lift_deck.mesh = preload("res://art/models/lift.obj")
 			base.add_child(lift_deck)
-			lift_deck.position = dock-Vector3.UP*0.12
-			box(base,dock-Vector3.UP*1.7,Vector3(0.32,3,0.32),Color("#ad98ad"))
+			lift_deck.position = dock
+			box(base,dock-Vector3.UP*2.1,Vector3(0.32,3,0.32),Color("#ad98ad"))
+			lift_piston = MeshInstance3D.new()
+			lift_piston.mesh = preload("res://art/models/lift_piston.obj")
+			base.add_child(lift_piston)
+			lift_piston.position = dock-Vector3.UP*0.64
+			set_lift_height(dock.y)
 			continue
 		for x in range(center.x-1,center.x+2):
 			var tile := MeshInstance3D.new()
@@ -155,7 +161,7 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 			if plan.has_pallet and x == 0 and row <= 3:
 				continue
 			var roof_rain := puzzle.kind == SidePuzzle.Kind.SHELTER and Vector2i(x,row) == puzzle.cell(3)
-			if not roof_rain and (not plan.contains(Vector2i(x,row)) or Vector2i(x,row) in rest_cells or rng.next_word() % 5 != 0):
+			if not roof_rain and (not plan.contains(Vector2i(x,row)) or Vector2i(x,row) in rest_cells or rng.next_word() % 8 != 0):
 				continue
 			var red := 1 if roof_rain else rng.next_word() % 2
 
@@ -203,14 +209,18 @@ func ride_lift(cell: Vector2i) -> void:
 	var top := surface_y(cell)
 	ride = create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	ride.set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	ride.tween_property(lift_deck,"position:y",top-0.12,0.85)
+	ride.tween_method(set_lift_height,lift_deck.position.y+0.12,top,0.85)
 	ride.tween_property(player,"position:y",top+0.5,0.85)
 
 func reset_lift() -> void:
 	if ride:
 		ride.kill()
 	lift_high = false
-	lift_deck.position.y = surface_y(plan.center_at(plan.lift_row))-0.12
+	set_lift_height(surface_y(plan.center_at(plan.lift_row)))
+
+func set_lift_height(top: float) -> void:
+	lift_deck.position.y = top-0.12
+	lift_piston.scale.y = top-0.24-lift_piston.position.y
 
 func activate_seal(cell: Vector2i) -> bool:
 	if opened >= seals.size() or cell != seals[opened]:
