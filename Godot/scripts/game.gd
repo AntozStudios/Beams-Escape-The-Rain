@@ -18,6 +18,7 @@ var map_id := Maps.CLASSIC
 var sunlight := DirectionalLight3D.new()
 var level := 0
 var lives := 3
+const MAX_LIVES := 3
 var revivals := 0
 var armed := false
 var started := false
@@ -123,8 +124,10 @@ func add_section() -> void:
 	add_child(section)
 	section.build(level,surface,player,map_id)
 	if not sections.is_empty():
-		section.position.y = sections.back().surface_y(Vector2i(0,7)) - section.surface_y(Vector2i.ZERO)
+		section.position.z = sections.back().position.z - sections.back().length
+		section.position.y = sections.back().surface_y(Vector2i(0,sections.back().length-1)) - section.surface_y(Vector2i.ZERO)
 	section.hit.connect(on_hit)
+	section.heart_collected.connect(on_heart_collected)
 	sections.append(section)
 	if sections.size() > 3:
 		sections.pop_front().queue_free()
@@ -176,17 +179,22 @@ func screen_step(input_direction: Vector2, view: Basis) -> Vector2i:
 func move(step: Vector2i) -> void:
 	if dead or not armed or locked_until > 0 or roll_elapsed < move_time:
 		return
+	if absi(step.x)+absi(step.y) != 1:
+		return
 	var next := cell + step
-	if absi(next.x) > 3 or (step.y != 0 and (next.y < 0 or next.y > 7)):
+	if absi(next.x) > 3 or (step.y != 0 and (next.y < 0 or next.y >= sections.back().length)):
 		return
 	var target_section: Section = sections.back()
 	if next.y == -1:
+		if sections.size() < 2:
+			return
 		target_section = sections[-2]
-	var target_row := 7 if next.y == -1 else next.y
+	var target_row := target_section.length-1 if next.y == -1 else next.y
 	rise = target_section.surface_y(Vector2i(next.x,target_row)) + 0.5 - player.position.y
 	if absf(rise) > 1.01:
 		return
-	move_time = ROLL_TIME if is_zero_approx(rise) else ROLL_TIME * 2
+	var current_roll_time := maxf(0.075,ROLL_TIME*pow(0.97,float(level)))
+	move_time = current_roll_time if is_zero_approx(rise) else current_roll_time * 2
 	cell = next
 	direction = Vector3(step.x,0,-step.y)
 	origin = player.position
@@ -205,7 +213,8 @@ func _physics_process(delta: float) -> void:
 	locked_until = maxf(0,locked_until-delta)
 	if roll_elapsed < move_time:
 		roll_elapsed = minf(move_time,roll_elapsed+delta)
-		var roll_phase := roll_elapsed / ROLL_TIME
+		var current_roll_time := maxf(0.075,ROLL_TIME*pow(0.97,float(level)))
+		var roll_phase := roll_elapsed / current_roll_time
 		var lift := 0.0
 		if rise > 0:
 			lift = rise * smoothstep(0,1,roll_phase)
@@ -218,11 +227,11 @@ func _physics_process(delta: float) -> void:
 		player.transform = Transform3D(rotation_basis,pivot+rotation_basis*(origin-pivot)+Vector3.UP*lift)
 		if roll_elapsed >= move_time:
 			player.transform = Transform3D(Basis.IDENTITY,origin+direction+Vector3.UP*rise)
-			if cell == Vector2i(0,7):
+			if cell == Vector2i(0,sections.back().length-1):
 				sections.back().consume_checkpoint()
 				level += 1
 				cell.y = -1
-				locked_until = 1.28333
+				locked_until = 0.6
 				play("checkPoint",0.11)
 				add_section()
 				ui.refresh()
@@ -237,7 +246,7 @@ func _physics_process(delta: float) -> void:
 func update_descent_view() -> void:
 	var section: Section = sections.back()
 	var ahead := cell + Vector2i.DOWN
-	if map_id == Maps.CLASSIC or cell.y < 0 or ahead.y >= Section.LENGTH:
+	if map_id == Maps.CLASSIC or cell.y < 0 or ahead.y >= section.length:
 		target_orbit = 0.0
 		return
 	if section.elevation(cell) - section.elevation(ahead) != 1:
@@ -337,6 +346,16 @@ func on_hit(harmful: bool, point: Vector3) -> void:
 		if lives <= 0:
 			die()
 		ui.refresh()
+
+func on_heart_collected(heart: Node3D) -> void:
+	if lives >= MAX_LIVES:
+		return
+	lives += 1
+	heart.set_meta("collected",true)
+	heart.queue_free()
+	play("checkPoint",0.11)
+	burst(player.position,Color(1,0.12,0.25),18)
+	ui.refresh()
 
 func die() -> void:
 	if dead:

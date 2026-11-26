@@ -4,6 +4,9 @@ enum { CLASSIC, HILLS, PASS, RIDGE }
 const NAMES := ["Classic", "Grüne Hügel", "Eispass", "Sandgrat"]
 const DIFFICULTY := ["Original", "Leicht", "Mittel", "Schwer"]
 const SURFACES := [2, 2, 1, 0]
+
+static func section_length(index: int) -> int:
+	return 8 + (index % 3) * 2
 # Rows run from the entrance towards the checkpoint. Digits are elevations.
 # A dot is the valley floor, three steps below zero. A peak is six steps high.
 const LAYOUTS := [
@@ -25,12 +28,13 @@ const LAYOUTS := [
 	]
 ]
 
-static func elevation(map_id: int, cell: Vector2i, mirrored: bool, variation: int = 0) -> int:
+static func elevation(map_id: int, cell: Vector2i, mirrored: bool, variation: int = 0, section_rows: int = 8) -> int:
 	if map_id == CLASSIC:
 		return 0
 	var column := 3 - cell.x if mirrored else 3 + cell.x
 	var pattern: Array = LAYOUTS[map_id][variation % LAYOUTS[map_id].size()]
-	var symbol: String = pattern[cell.y][column]
+	var source_row := roundi(float(cell.y) * 7.0 / float(section_rows - 1))
+	var symbol: String = pattern[source_row][column]
 	if symbol == ".":
 		return -3
 	if symbol == "^":
