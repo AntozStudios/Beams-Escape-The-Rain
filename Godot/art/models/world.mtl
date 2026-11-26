@@ -1,3 +1,8 @@
+newmtl petal
+Kd 0.99 0.96 0.90
+Ks 0 0 0
+illum 1
+
 newmtl wood
 Kd 0.58824 0.39216 0.28627
 Ks 0 0 0
