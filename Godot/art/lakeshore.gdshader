@@ -9,8 +9,6 @@ uniform vec4 wet_sand : source_color = vec4(0.77, 0.74, 0.66, 1.0);
 uniform vec4 dune : source_color = vec4(0.88, 0.78, 0.64, 1.0);
 uniform vec4 meadow : source_color = vec4(0.27, 0.60, 0.35, 1.0);
 uniform vec4 meadow_light : source_color = vec4(0.44, 0.73, 0.42, 1.0);
-uniform vec2 west_meadow;
-uniform vec2 east_meadow;
 uniform vec4 reflection : source_color = vec4(0.78, 0.66, 0.72, 1.0);
 uniform vec4 foam : source_color = vec4(0.91, 0.98, 0.99, 1.0);
 uniform vec2 islet_center;
@@ -43,10 +41,7 @@ vec3 beach_color(float inland, vec2 p, float aa) {
 	float dunes = smoothstep(0.10,0.85,cos(ridge));
 	beach = mix(beach,dune.rgb,0.57*dunes*smoothstep(0.9,2.8,inland));
 
-	vec2 radius = vec2(4.5,9.0);
-	float border = min(length((p-west_meadow)/radius),length((p-east_meadow)/radius));
-	border += 0.06*sin(p.y*1.1) + 0.04*sin(p.x*1.7+p.y*0.6);
-	float cover = (1.0-smoothstep(0.99-aa*0.2,0.99+aa*0.2,border))*smoothstep(1.20-aa,1.20+aa,inland);
+	float cover = smoothstep(1.20-aa,1.20+aa,inland);
 	float breeze = sin(dot(p,vec2(0.72,0.32))-TIME*1.1);
 	vec3 grass = mix(meadow.rgb,meadow_light.rgb,0.42+0.2*sin(p.y*0.7)+0.08*breeze);
 	return mix(beach,grass,cover);

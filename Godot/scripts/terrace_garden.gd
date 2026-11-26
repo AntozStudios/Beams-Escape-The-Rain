@@ -16,7 +16,7 @@ func build(plan, level: int, earth: bool) -> void:
 	wash.set_shader_parameter("phase",float(level)*0.57)
 	var shore_center := to_global(islet)
 	wash.set_shader_parameter("islet_center",Vector2(shore_center.x,shore_center.z))
-	build_meadows(wash,level,middle)
+	build_meadows(level,middle,plan.centers.size()+20.0)
 	lake.material_override = wash
 	lake.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	place(TERRACE,islet,Vector3(2.8,0.35,0.84))
@@ -25,32 +25,25 @@ func build(plan, level: int, earth: bool) -> void:
 	var ruin := place(RUIN,Vector3(6.5,0.0,plan.centers.size()*0.36),Vector3.ONE)
 	ruin.rotation.y = deg_to_rad(-18 if level % 2 else 12)
 
-func build_meadows(wash: ShaderMaterial, level: int, middle: float) -> void:
+func build_meadows(level: int, middle: float, span: float) -> void:
 	var phase := float(level)*0.57
-	var west_z := middle+2.5
-	var east_z := middle-3.0
-	var west := Vector2(-8.8+2.7*sin(west_z*0.21+phase)+0.9*cos(west_z*0.46)-4.4,west_z)
-	var east := Vector2(10.8+3.4*cos(east_z*0.16-phase)+4.4,east_z)
-	wash.set_shader_parameter("west_meadow",west)
-	wash.set_shader_parameter("east_meadow",east)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = level+901
 	var flowers: Array[Transform3D] = []
 	var transforms: Array[Transform3D] = []
-	for patch: Vector2 in [west,east]:
-		for group in 36:
-			var offset := Vector2.from_angle(rng.randf()*TAU)*sqrt(rng.randf())
-			var cluster := patch+offset*Vector2(3.5,7.5)
+	for side: int in [-1,1]:
+		for group in 48:
+			var z := middle + ((group+rng.randf())/48.0-0.5)*span
+			var inland := rng.randf_range(2.0,11.0)
 			for tuft in 5:
-				var point := cluster+Vector2(rng.randfn(0,0.29),rng.randfn(0,0.44))
-				var bank := -8.8+2.7*sin(point.y*0.21+phase)+0.9*cos(point.y*0.46)
-				if patch == east:
-					bank = 10.8+3.4*cos(point.y*0.16-phase)
-				if (point.x-bank)*signf(patch.x) < 1.7:
-					continue
+				var along := z+rng.randfn(0,0.44)
+				var bank := -8.8+2.7*sin(along*0.21+phase)+0.9*cos(along*0.46)
+				if side > 0:
+					bank = 10.8+3.4*cos(along*0.16-phase)
+				var point := Vector2(bank+side*maxf(1.7,inland+rng.randfn(0,0.29)),along)
 				var basis := Basis(Vector3.UP,rng.randf()*TAU).scaled(Vector3.ONE*rng.randf_range(0.62,1.15))
 				transforms.append(Transform3D(basis,Vector3(point.x,0.015,point.y-middle)))
-				if group % 5 == 0 and tuft < 3 and ((point-patch)/Vector2(4.5,9.0)).length() < 0.85:
+				if group % 5 == 0 and tuft < 3:
 					flowers.append(Transform3D(basis,Vector3(point.x+0.08,0.015,point.y-middle)))
 	var wind := ShaderMaterial.new()
 	wind.shader = preload("res://art/meadow_grass.gdshader")
