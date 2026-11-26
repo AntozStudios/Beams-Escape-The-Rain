@@ -1,12 +1,46 @@
 extends RefCounted
 
 enum { CLASSIC, HILLS, PASS, RIDGE }
-const NAMES := ["Classic", "Grüne Hügel", "Eispass", "Sandgrat"]
-const DIFFICULTY := ["Original", "Leicht", "Mittel", "Schwer"]
-const SURFACES := [2, 2, 1, 0]
+enum { CLASSIC_CAMPAIGN, EARTH_CAMPAIGN }
+const NAMES := ["Classic", "Erde"]
+const DIFFICULTY := ["30 Level", "30 Level"]
+const MAX_LEVELS := 30
+const INITIAL_UNLOCKED_LEVELS := 10
+const TERRAIN_COLORS := [Color("#f2ce99"), Color("#76c5c0"), Color("#a4cb9e")]
+const TERRAIN_SIDE_COLORS := [Color("#c78f77"), Color("#608eaa"), Color("#ad8799")]
 
-static func section_length(index: int) -> int:
-	return 8 + (index % 3) * 2
+static func layout_for_level(campaign: int, level: int) -> int:
+	if campaign == CLASSIC_CAMPAIGN:
+		return CLASSIC
+	return [HILLS,PASS,RIDGE][posmod(level-1,3)]
+
+static func surface_for_level(campaign: int, level: int) -> int:
+	if campaign == CLASSIC_CAMPAIGN:
+		return 2
+	return [2,0,1][posmod(level-1,3)]
+
+static func terrain_for_cell(campaign: int, level: int, cell: Vector2i, layout: int, mirrored: bool, rows: int) -> int:
+	if campaign == CLASSIC_CAMPAIGN:
+		return 2
+	# A narrow river winds through low ground, with sand banks and grassland around it.
+	var preferred_x := roundi(2.0 * sin(float(cell.y) * 0.62 + float(level) * 0.83))
+	var river_x := preferred_x
+	var best_score := INF
+	for x in range(-2,3):
+		var height := elevation(layout,Vector2i(x,cell.y),mirrored,level%3,rows)
+		var score := absf(float(x-preferred_x)) + maxf(0.0,float(height-1))*2.0
+		if score < best_score:
+			best_score = score
+			river_x = x
+	var distance_to_river := absi(cell.x-river_x)
+	if distance_to_river == 0:
+		return 1
+	if distance_to_river == 1:
+		return 0
+	return 2
+
+static func section_length(level: int) -> int:
+	return 12 + posmod(level-1,3) * 3
 # Rows run from the entrance towards the checkpoint. Digits are elevations.
 # A dot is the valley floor, three steps below zero. A peak is six steps high.
 const LAYOUTS := [

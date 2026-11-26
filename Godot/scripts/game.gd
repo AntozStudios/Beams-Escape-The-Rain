@@ -13,8 +13,12 @@ var mobile := Mobile.new()
 var player: MeshInstance3D
 var lamp := OmniLight3D.new()
 var environment := Environment.new()
+var sky_wash := ShaderMaterial.new()
 var sections: Array[Section] = []
 var map_id := Maps.CLASSIC
+var campaign_level := 1
+var stars_collected := 0
+var level_complete := false
 var sunlight := DirectionalLight3D.new()
 var level := 0
 var lives := 3
@@ -51,20 +55,32 @@ func _ready() -> void:
 	var world := WorldEnvironment.new()
 	world.environment = environment
 	add_child(world)
-	environment.background_mode = Environment.BG_COLOR
+	var backdrop := CanvasLayer.new()
+	backdrop.layer = -100
+	add_child(backdrop)
+	var sky := ColorRect.new()
+	backdrop.add_child(sky)
+	sky.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	sky.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	sky_wash.shader = preload("res://art/sky_wash.gdshader")
+	sky.material = sky_wash
+	environment.background_mode = Environment.BG_CANVAS
+	environment.background_canvas_max_layer = backdrop.layer
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color(0.212,0.227,0.259)
-	environment.ambient_light_energy = 1
+	environment.ambient_light_color = Color("#c5bed9")
+	environment.ambient_light_energy = 0.68
 	player = Section.box(self,START,Vector3.ONE,Color.WHITE)
 	player.add_child(lamp)
 	lamp.light_energy = 1.47
 	lamp.omni_range = 6.44
 	create_stars()
 	map_id = clampi(int(profile.value("map",Maps.CLASSIC)),0,Maps.NAMES.size()-1)
+	campaign_level = clampi(int(profile.value("current_level_%d" % map_id,1)),1,Maps.MAX_LEVELS)
+	level = campaign_level-1
 	add_child(sunlight)
 	sunlight.rotation_degrees = Vector3(-55,-30,0)
 	sunlight.light_energy = 0.85
-	sunlight.visible = map_id != Maps.CLASSIC
+	sunlight.light_color = Color("#ffead1")
 	add_section()
 	player.position.y = sections.back().surface_y(cell) + 0.5
 	update_descent_view()
@@ -112,44 +128,76 @@ func apply_settings() -> void:
 	material.emission_enabled = true
 	material.emission = skin
 	lamp.light_color = skin
-	environment.background_color = profile.color("skyColor",3)
+	var sky_tint := profile.color("skyColor",3)
+	var default_sky: bool = sky_tint == profile.ITEMS[3][3]
+	sky_wash.set_shader_parameter("upper", Color("#a4b7dc") if default_sky else sky_tint.lightened(0.16))
+	sky_wash.set_shader_parameter("lower", Color("#f6d8cd") if default_sky else sky_tint.lightened(0.48))
 	music.volume_db = linear_to_db(float(profile.value("Music",0.025)))
 	ui.set_vignette(float(profile.value("Vignette",0.5)))
 
 func add_section() -> void:
-	var surface: int = Maps.SURFACES[map_id]
-	if map_id == Maps.CLASSIC and not sections.is_empty():
-		surface = (sections.back().rng.next_word() % 4) % 3
+	var surface := Maps.surface_for_level(map_id,campaign_level)
+	var layout := Maps.layout_for_level(map_id,campaign_level)
 	var section := Section.new()
 	add_child(section)
-	section.build(level,surface,player,map_id)
-	if not sections.is_empty():
-		section.position.z = sections.back().position.z - sections.back().length
-		section.position.y = sections.back().surface_y(Vector2i(0,sections.back().length-1)) - section.surface_y(Vector2i.ZERO)
+	section.build(campaign_level,surface,player,layout,map_id)
 	section.hit.connect(on_hit)
 	section.heart_collected.connect(on_heart_collected)
+	section.star_collected.connect(on_star_collected)
 	sections.append(section)
-	if sections.size() > 3:
-		sections.pop_front().queue_free()
 
 func select_map(id: int) -> void:
-	if started or dead or id == map_id or id < 0 or id >= Maps.NAMES.size():
+	if started or dead or id < 0 or id >= Maps.NAMES.size():
 		return
 	map_id = id
 	profile.save("map",id)
-	var previous: Section = sections.pop_back()
-	remove_child(previous)
-	previous.queue_free()
+	campaign_level = clampi(int(profile.value("current_level_%d" % map_id,1)),1,Maps.MAX_LEVELS)
+	profile.save("current_level_%d" % map_id,campaign_level)
+	level = campaign_level-1
+	reset_level()
+	
+
+func start_level(selected_level: int) -> void:
+	if selected_level < 1 or selected_level > Maps.MAX_LEVELS:
+		return
+	var unlocked := clampi(maxi(int(profile.value("unlocked_%d" % map_id,Maps.INITIAL_UNLOCKED_LEVELS)),Maps.INITIAL_UNLOCKED_LEVELS),1,Maps.MAX_LEVELS)
+	if selected_level > unlocked:
+		return
+	campaign_level = selected_level
+	profile.save("current_level_%d" % map_id,campaign_level)
+	level = campaign_level-1
+	reset_level()
+	armed = true
+	ui.close()
+	ui.refresh()
+
+func reset_level() -> void:
+	for section in sections:
+		section.queue_free()
+	sections.clear()
+	cell = Vector2i.ZERO
+	stars_collected = 0
+	level_complete = false
+	dead = false
+	started = false
+	armed = false
+	lives = MAX_LIVES
+	revivals = 0
+	idle = 0
+	locked_until = 0
+	roll_elapsed = ROLL_TIME
+	move_time = ROLL_TIME
+	player.transform = Transform3D(Basis.IDENTITY,START)
+	player.show()
 	add_section()
-	player.position.y = sections.back().surface_y(cell) + 0.5
-	sunlight.visible = id != Maps.CLASSIC
+	player.position.y = sections.back().surface_y(cell)+0.5
 	update_descent_view()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not armed or dead or ui.modal_visible():
 		return
 	if event is InputEventKey and not event.pressed and not event.echo:
-		var keys := {KEY_LEFT:Vector2.LEFT,KEY_RIGHT:Vector2.RIGHT,KEY_UP:Vector2.UP,KEY_DOWN:Vector2.DOWN}
+		var keys := {KEY_LEFT:Vector2.LEFT,KEY_RIGHT:Vector2.RIGHT,KEY_UP:Vector2.UP,KEY_DOWN:Vector2.DOWN,KEY_A:Vector2.LEFT,KEY_D:Vector2.RIGHT,KEY_W:Vector2.UP,KEY_S:Vector2.DOWN}
 		if keys.has(event.keycode):
 			move(screen_step(keys[event.keycode],camera.global_basis))
 	elif event is InputEventScreenTouch:
@@ -177,7 +225,7 @@ func screen_step(input_direction: Vector2, view: Basis) -> Vector2i:
 	return best
 
 func move(step: Vector2i) -> void:
-	if dead or not armed or locked_until > 0 or roll_elapsed < move_time:
+	if dead or level_complete or not armed or locked_until > 0 or roll_elapsed < move_time:
 		return
 	if absi(step.x)+absi(step.y) != 1:
 		return
@@ -185,12 +233,7 @@ func move(step: Vector2i) -> void:
 	if absi(next.x) > 3 or (step.y != 0 and (next.y < 0 or next.y >= sections.back().length)):
 		return
 	var target_section: Section = sections.back()
-	if next.y == -1:
-		if sections.size() < 2:
-			return
-		target_section = sections[-2]
-	var target_row := target_section.length-1 if next.y == -1 else next.y
-	rise = target_section.surface_y(Vector2i(next.x,target_row)) + 0.5 - player.position.y
+	rise = target_section.surface_y(next) + 0.5 - player.position.y
 	if absf(rise) > 1.01:
 		return
 	var current_roll_time := maxf(0.075,ROLL_TIME*pow(0.97,float(level)))
@@ -204,11 +247,11 @@ func move(step: Vector2i) -> void:
 	if not (step == Vector2i.DOWN and rise < 0):
 		update_descent_view()
 	idle = 0
-	play("player",0.11)
+	play("player",0.075)
 	ui.refresh()
 
 func _physics_process(delta: float) -> void:
-	if dead:
+	if dead or level_complete:
 		return
 	locked_until = maxf(0,locked_until-delta)
 	if roll_elapsed < move_time:
@@ -227,20 +270,30 @@ func _physics_process(delta: float) -> void:
 		player.transform = Transform3D(rotation_basis,pivot+rotation_basis*(origin-pivot)+Vector3.UP*lift)
 		if roll_elapsed >= move_time:
 			player.transform = Transform3D(Basis.IDENTITY,origin+direction+Vector3.UP*rise)
-			if cell == Vector2i(0,sections.back().length-1):
+			if cell == sections.back().checkpoint_cell:
 				sections.back().consume_checkpoint()
-				level += 1
-				cell.y = -1
-				locked_until = 0.6
+				level_complete = true
+				locked_until = 0.0
+				var unlocked := maxi(int(profile.value("unlocked_%d" % map_id,Maps.INITIAL_UNLOCKED_LEVELS)),Maps.INITIAL_UNLOCKED_LEVELS)
+				profile.save("unlocked_%d" % map_id,mini(Maps.MAX_LEVELS,maxi(unlocked,campaign_level+1)))
+				var star_key := "stars_%d_%d" % [map_id,campaign_level]
+				profile.save(star_key,maxi(stars_collected,int(profile.value(star_key,0))))
+				if campaign_level < Maps.MAX_LEVELS:
+					profile.save("current_level_%d" % map_id,campaign_level+1)
 				play("checkPoint",0.11)
-				add_section()
-				ui.refresh()
+				ui.show_level_complete()
+				return
 			update_descent_view()
 	if started:
+		var active: Section = sections.back()
+		if cell in active.rest_cells or active.terrain_at(cell) != 0:
+			ui.warning.text = ""
+			idle = 0
+			return
 		idle += delta
-		var grace: float = Section.GRACE[sections.back().terrain]
-		ui.warning.text = "Move or Die: %.1f" % maxf(0,3+grace-idle) if idle >= 3 else ""
-		if idle >= 3 + grace:
+		var grace: float = Section.GRACE[sections.back().terrain_at(cell)]
+		ui.warning.text = "Sand sinks in %.1f" % maxf(0,10+grace-idle) if idle >= 8 else ""
+		if idle >= 10 + grace:
 			die()
 
 func update_descent_view() -> void:
@@ -271,6 +324,7 @@ func update_descent_view() -> void:
 	target_orbit = view_side * DOWNHILL_VIEW - home_yaw
 
 func _process(delta: float) -> void:
+	sunlight.light_energy = 0.85 + 0.045*sin(Time.get_ticks_msec()*0.00018)
 	var target := player.position
 	if map_id == Maps.CLASSIC:
 		target.y = START.y
@@ -336,7 +390,7 @@ func burst(point: Vector3, color: Color, count: int) -> void:
 	particles.emitting = true
 
 func on_hit(harmful: bool, point: Vector3) -> void:
-	if dead:
+	if dead or level_complete:
 		return
 	burst(point, Color.RED if harmful else profile.color("playerSkin",0),12)
 	if harmful:
@@ -356,8 +410,29 @@ func on_heart_collected(heart: Node3D) -> void:
 	burst(player.position,Color(1,0.12,0.25),18)
 	ui.refresh()
 
+func on_star_collected(star: Node3D) -> void:
+	if level_complete or star.get_meta("collected",false):
+		return
+	stars_collected = mini(3,stars_collected+1)
+	star.set_meta("collected",true)
+	star.queue_free()
+	var chime := play("checkPoint",0.065)
+	chime.pitch_scale = 1.0 + 0.08*stars_collected
+	burst(player.position,Color(1.0,0.82,0.12),6)
+	ui.refresh()
+
+func continue_level() -> void:
+	if campaign_level >= Maps.MAX_LEVELS:
+		return
+	start_level(campaign_level+1)
+
+func return_to_menu() -> void:
+	reset_level()
+	ui.close()
+	ui.refresh()
+
 func die() -> void:
-	if dead:
+	if dead or level_complete:
 		return
 	dead = true
 	lives = 0

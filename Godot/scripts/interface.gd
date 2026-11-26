@@ -9,11 +9,13 @@ const LINKS := {
 }
 var game
 var root := Control.new()
+var pad := HBoxContainer.new()
 var navigation := VBoxContainer.new()
 var start := Button.new()
 var map_button := Button.new()
 var life := Label.new()
 var score := Label.new()
+var star_score := Label.new()
 var warning := Label.new()
 var shade := ColorRect.new()
 var popup := ColorRect.new()
@@ -28,6 +30,14 @@ var sign_out_button: Button
 func setup(owner_game) -> void:
 	game = owner_game
 	root.theme = Theme.new()
+	for state in ["normal","hover","pressed","disabled"]:
+		var style := StyleBoxFlat.new()
+		var fills := {"normal":"524b69","hover":"665d7c","pressed":"403c55","disabled":"726e81"}
+		style.bg_color = Color(fills[state])
+		style.set_corner_radius_all(10)
+		root.theme.set_stylebox(state,"Button",style)
+	root.theme.set_color("font_outline_color","Label",Color("#403952"))
+	root.theme.set_constant("outline_size","Label",3)
 	root.theme.default_font = preload("res://art/gomarice_goma_block.ttf")
 	add_child(root)
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -43,7 +53,7 @@ func setup(owner_game) -> void:
 	start.text = "Tap to Start"
 	start.flat = true
 	start.add_theme_font_size_override("font_size",28)
-	start.pressed.connect(func(): game.armed = true; refresh())
+	start.pressed.connect(func(): game.start_level(game.campaign_level))
 	root.add_child(map_button)
 	map_button.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	map_button.offset_left = -100
@@ -58,9 +68,9 @@ func setup(owner_game) -> void:
 	navigation.offset_left = -74
 	navigation.offset_right = -10
 	navigation.offset_top = 10
-	button(navigation,"?",instructions).modulate = Color(1,0.241,0.241)
-	button(navigation,"A",items).modulate = Color(0.545,1,0.288)
-	button(navigation,"P",account).modulate = Color(0,0.524,1)
+	button(navigation,"?",instructions).modulate = Color("#68425a")
+	button(navigation,"A",items).modulate = Color("#395d56")
+	button(navigation,"P",account).modulate = Color("#454968")
 	var store := button(navigation,"",func(): OS.shell_open("https://play.google.com/store/apps/details?id=com.AntozStudios.BeamsEscapeTheRain&hl=de"))
 	store.icon = preload("res://art/PlayStoreIcon.png")
 	store.expand_icon = false
@@ -74,7 +84,7 @@ func setup(owner_game) -> void:
 	for option: Button in navigation.get_children():
 		option.flat = true
 		option.custom_minimum_size = Vector2(62,61)
-	for label: Label in [life, score, warning]:
+	for label: Label in [life, score, warning, star_score]:
 		root.add_child(label)
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		label.add_theme_font_size_override("font_size",34)
@@ -82,13 +92,26 @@ func setup(owner_game) -> void:
 		label.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	score.offset_top = 24
 	score.add_theme_font_size_override("font_size",50)
+	star_score.offset_top = 76
+	star_score.add_theme_font_size_override("font_size",28)
+	star_score.modulate = Color("#ffda8f")
 	life.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	life.modulate = Color(0.81132,0.29238,0.29238)
+	life.modulate = Color("#b65162")
 	life.add_theme_font_size_override("font_size",84)
 	life.offset_left = 18
 	life.offset_top = 15
 	warning.offset_top = 145
 	warning.add_theme_font_size_override("font_size",22)
+	root.add_child(pad)
+	pad.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	pad.offset_left = -130
+	pad.offset_right = 130
+	pad.offset_top = -84
+	pad.offset_bottom = -20
+	for direction: Vector2 in [Vector2.LEFT,Vector2.UP,Vector2.DOWN,Vector2.RIGHT]:
+		var arrows := {Vector2.LEFT:"\u2190",Vector2.UP:"\u2191",Vector2.DOWN:"\u2193",Vector2.RIGHT:"\u2192"}
+		var key := button(pad,arrows[direction],pad_move.bind(direction))
+		key.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.add_child(popup)
 	popup.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	popup.color = Color.TRANSPARENT
@@ -102,15 +125,22 @@ func set_vignette(intensity: float) -> void:
 func modal_visible() -> bool:
 	return popup.visible
 
+func pad_move(direction: Vector2) -> void:
+	if not modal_visible():
+		game.move(game.screen_step(direction,game.camera.global_basis))
+
 func refresh() -> void:
+	pad.visible = game.armed and not game.dead and not game.level_complete and bool(game.profile.value("Direction buttons",false))
 	life.text = ".".repeat(game.lives)
-	life.visible = game.armed and not game.dead
-	score.text = str(game.level)
-	score.visible = game.started and not game.dead
+	life.visible = game.armed and not game.dead and not game.level_complete
+	score.text = str(game.campaign_level)
+	score.visible = game.started and not game.dead and not game.level_complete
+	star_score.text = "\u2605 %d/3" % game.stars_collected
+	star_score.visible = game.armed and not game.dead and not game.level_complete
 	start.visible = not game.armed
 	map_button.visible = not game.armed
 	navigation.visible = not game.started
-	if game.dead or not game.started:
+	if game.dead or game.level_complete or not game.started:
 		warning.text = ""
 
 func button(parent: Control, caption: String, action: Callable) -> Button:
@@ -140,7 +170,7 @@ func panel(title: String) -> void:
 		child.queue_free()
 	frame = ColorRect.new()
 	popup.add_child(frame)
-	frame.color = Color(0.217,0.217,0.217)
+	frame.color = Color("#3f3b52")
 	frame.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	var panel_size := Vector2(462,667).min(root.size-Vector2(16,16))
 	frame.offset_left = -panel_size.x/2
@@ -180,11 +210,16 @@ func close() -> void:
 
 func instructions() -> void:
 	panel("")
-	label(content,"Movement:\nSwipe in any direction to move the player. On mountain maps you can climb or descend one block per swipe. Find a way around taller cliffs.\n\nRain:\nRed rain: Avoid it – it's deadly!\n\nGround timer:\nStanding still will kill you!\nGrass: Max 6 seconds\nIce: Max 4 seconds\nSand: Max 2 seconds\n\nRewards:\nWatch up to 3 ads per game to receive 1 life each.")
+	label(content,"Swipe or use WASD or arrow keys to roll. Climb one step at a time.\n\nMint diamonds are safe resting places. A red diamond warns of incoming rain. On sand, move before it sinks.\n\nExplore side paths for stars and reach the checkpoint to finish.")
 	exit_button(close_animated)
 
 func settings() -> void:
 	panel("Settings")
+	var toggle := CheckButton.new()
+	toggle.text = "Direction buttons"
+	toggle.button_pressed = bool(game.profile.value("Direction buttons",false))
+	content.add_child(toggle)
+	toggle.toggled.connect(func(enabled: bool): game.profile.save("Direction buttons",enabled); refresh())
 	slider("Follow Player",10,1,1)
 	slider("Vignette",0.5,0.01,0.5)
 	slider("Music",0.07,0.001,0.025)
@@ -194,7 +229,8 @@ func maps() -> void:
 	panel("Maps")
 	for i in game.Maps.NAMES.size():
 		var title: String = game.Maps.NAMES[i]
-		var difficulty: String = game.Maps.DIFFICULTY[i]
+		var unlocked := maxi(int(game.profile.value("unlocked_%d" % i,game.Maps.INITIAL_UNLOCKED_LEVELS)),game.Maps.INITIAL_UNLOCKED_LEVELS)
+		var difficulty := "%d/%d Level" % [mini(unlocked,game.Maps.MAX_LEVELS),game.Maps.MAX_LEVELS]
 		if i == game.map_id:
 			title += "  ✓"
 		button(content,"%s · %s" % [title,difficulty],choose_map.bind(i))
@@ -202,7 +238,26 @@ func maps() -> void:
 
 func choose_map(id: int) -> void:
 	game.select_map(id)
-	close_animated()
+	levels()
+
+func levels() -> void:
+	panel(game.Maps.NAMES[game.map_id] + " Level")
+	var unlocked := clampi(maxi(int(game.profile.value("unlocked_%d" % game.map_id,game.Maps.INITIAL_UNLOCKED_LEVELS)),game.Maps.INITIAL_UNLOCKED_LEVELS),1,game.Maps.MAX_LEVELS)
+	var grid := GridContainer.new()
+	grid.columns = 5
+	grid.add_theme_constant_override("h_separation",8)
+	grid.add_theme_constant_override("v_separation",8)
+	content.add_child(grid)
+	for level_index in range(1,game.Maps.MAX_LEVELS+1):
+		var earned := int(game.profile.value("stars_%d_%d" % [game.map_id,level_index],0))
+		var caption := str(level_index)
+		if earned > 0:
+			caption += "\n" + "\u2605".repeat(earned)
+		var entry := button(grid,caption,game.start_level.bind(level_index))
+		entry.custom_minimum_size = Vector2(62,58)
+		entry.disabled = level_index > unlocked
+		entry.modulate = Color("#ffda8f") if earned > 0 else Color.WHITE
+	button(content,"Maps",maps)
 
 func slider(key: String, maximum: float, step: float, fallback: float) -> void:
 	var value := float(game.profile.value(key,fallback))
@@ -267,7 +322,7 @@ func close_animated() -> void:
 func show_death() -> void:
 	panel("")
 	frame.hide()
-	popup.color = Color(0.217,0.217,0.217,0.439)
+	popup.color = Color("#3f3b5280")
 	var again := button(popup,"Try Again",retry)
 	death_position(again,-182,122)
 	reward_button = button(popup,"Watch an (1X Life)",game.mobile.watch)
@@ -288,7 +343,19 @@ func death_position(control: Control, y: float, height: float) -> void:
 
 func retry() -> void:
 	game.mobile.banner(false)
-	get_tree().reload_current_scene()
+	game.start_level(game.campaign_level)
+
+func show_level_complete() -> void:
+	panel("Level %d geschafft" % game.campaign_level)
+	var stars := "\u2605".repeat(game.stars_collected) + "\u2606".repeat(3-game.stars_collected)
+	label(content,stars,38).modulate = Color("#ffda8f")
+	if game.campaign_level < game.Maps.MAX_LEVELS:
+		button(content,"Weiter",game.continue_level)
+	else:
+		label(content,"Welt abgeschlossen",24)
+	button(content,"Nochmal",retry)
+	button(content,"Menu",game.return_to_menu)
+	refresh()
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(reward_button):
