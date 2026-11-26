@@ -236,12 +236,13 @@ func move(step: Vector2i) -> void:
 	var next := cell + step
 	if not sections.back().plan.contains(next):
 		return
-	var target_section: Section = sections.back()
-	rise = target_section.surface_y(next) + 0.5 - player.position.y
+	var roll_duration := maxf(0.075,ROLL_TIME*pow(0.97,float(level)))
+	if not platform.push_pallet(cell,next,roll_duration):
+		return
+	rise = platform.surface_y(next) + 0.5 - player.position.y
 	if absf(rise) > 1.01:
 		return
-	var current_roll_time := maxf(0.075,ROLL_TIME*pow(0.97,float(level)))
-	move_time = current_roll_time if is_zero_approx(rise) else current_roll_time * 2
+	move_time = roll_duration if is_zero_approx(rise) else roll_duration * 2
 	cell = next
 	direction = Vector3(step.x,0,-step.y)
 	origin = player.position

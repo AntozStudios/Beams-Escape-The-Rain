@@ -15,6 +15,8 @@ const GRACE := [2.0, 4.0, 6.0]
 const HEART := Pickup.Kind.HEART
 const STAR := Pickup.Kind.STAR
 var lift_deck: MeshInstance3D
+var pallet: MeshInstance3D
+var pallet_cell := Maps.PALLET_START
 var lift_high := false
 var ride: Tween
 var mirrored: bool
@@ -54,7 +56,8 @@ func elevation(cell: Vector2i) -> int:
 	return plan.heights[cell.y] if plan.contains(cell) else -3
 
 func surface_y(cell: Vector2i) -> float:
-	return GROUND + elevation(cell)
+	var on_pallet := pallet != null and cell == pallet_cell
+	return GROUND + elevation(cell) + (1.0 if on_pallet else 0.0)
 
 func terrain_at(cell: Vector2i) -> int:
 	return plan.surfaces[cell.y]
@@ -84,9 +87,10 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 		var center := plan.center_at(row)
 		if row == plan.lift_row:
 			var dock := Vector3(center.x,surface_y(center),3.5-row)
-			lift_deck = box(base,dock-Vector3.UP*0.12,Vector3(1,0.24,1),Color("#8275a6"))
-			for side in [-1,1]:
-				box(lift_deck,Vector3(side*0.38,0.13,0),Vector3(0.08,0.025,0.85),Color("#ffda8f"))
+			lift_deck = MeshInstance3D.new()
+			lift_deck.mesh = preload("res://art/models/lift.obj")
+			base.add_child(lift_deck)
+			lift_deck.position = dock-Vector3.UP*0.12
 			box(base,dock-Vector3.UP*1.7,Vector3(0.32,3,0.32),Color("#ad98ad"))
 			continue
 		for x in range(center.x-1,center.x+2):
@@ -97,6 +101,8 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 			tile.scale = Vector3(0.99,depth,0.99)
 			tile.position = Vector3(x,surface_y(center)-depth/2,3.5-row)
 			tiles.append(tile)
+	if plan.has_pallet:
+		build_pallet()
 	for i in range(4):
 		var cell := plan.center_at((i+1)*(length-1)/5)
 		cell.x += 1 if i%2 == 0 else -1
@@ -108,15 +114,21 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 			rest_cells.append(cell)
 			var mark := Label3D.new()
 			mark.text = str(seals.size())
+			mark.font_size = 96
+			mark.pixel_size = 0.008
+			mark.outline_size = 8
+			mark.outline_modulate = Color("#403952")
 			mark.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 			base.add_child(mark)
-			mark.position = Vector3(cell.x,surface_y(cell)+0.6,3.5-row)
+			mark.position = Vector3(cell.x,surface_y(cell)+0.85,3.5-row)
 			seal_marks.append(mark)
 	for cell in rest_cells:
 		if cell != checkpoint_cell and cell.y != plan.lift_row:
 			var plate := box(base,Vector3(cell.x,surface_y(cell)+0.025,3.5-cell.y),Vector3(0.62,0.05,0.62),Color("#b5f3de"))
 			plate.rotation.y = PI/4
-	build_scenery(base)
+	var garden := preload("res://scripts/terrace_garden.gd").new()
+	base.add_child(garden)
+	garden.build(plan,index,world == Maps.EARTH)
 	var rain_meshes: Array[BoxMesh] = []
 	for rain_color: Color in [Color("#8595b4"),Maps.RAIN_RED]:
 		var rain_mesh := BoxMesh.new()
@@ -131,6 +143,8 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 	for x in range(-3,4):
 		for row in length:
 			var point := Vector3(x, GROUND - 0.5, 3.5 - row)
+			if plan.has_pallet and x == 0 and row <= 3:
+				continue
 			if not plan.contains(Vector2i(x,row)) or Vector2i(x,row) in rest_cells or rng.next_word() % 5 != 0:
 				continue
 			var red := rng.next_word() % 2
@@ -154,6 +168,26 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 		checkpoint.mesh.material.albedo_color = Color("#766689")
 	checkpoint.mesh.material.albedo_texture = preload("res://art/EndTop.png")
 
+func build_pallet() -> void:
+	var floor_y := GROUND + elevation(pallet_cell)
+	var rails := MeshInstance3D.new()
+	rails.mesh = preload("res://art/models/rails.obj")
+	add_child(rails)
+	rails.position = Vector3(0,floor_y,2.0)
+	pallet = MeshInstance3D.new()
+	pallet.mesh = preload("res://art/models/pallet.obj")
+	add_child(pallet)
+	pallet.position = Vector3(pallet_cell.x,floor_y,3.5-pallet_cell.y)
+
+func push_pallet(from: Vector2i, next: Vector2i, duration: float) -> bool:
+	if pallet == null or next != pallet_cell or pallet_cell == Maps.PALLET_STOP:
+		return true
+	if from != Vector2i.ZERO:
+		return false
+	pallet_cell = Maps.PALLET_STOP
+	create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS).set_trans(Tween.TRANS_SINE).tween_property(pallet,"position:z",3.5-pallet_cell.y,duration)
+	return true
+
 func ride_lift(cell: Vector2i) -> void:
 	lift_high = not lift_high
 	var top := surface_y(cell)
@@ -176,32 +210,6 @@ func activate_seal(cell: Vector2i) -> bool:
 	if opened == seals.size():
 		checkpoint.mesh.material.albedo_color = Color.WHITE
 	return true
-
-func build_scenery(base: Node3D) -> void:
-	for i in range(2):
-		var island := Node3D.new()
-		base.add_child(island)
-		island.position = Vector3(8 + (i%2)*3,GROUND-2,2-i*10)
-		box(island,Vector3.DOWN*2,Vector3(2.7,4,2.4),Color("#b5a2b5"))
-		box(island,Vector3.ZERO,Vector3(2.8,0.22,2.5),Color("#c5d6af"))
-		if (i == 0) == mirrored:
-			box(island,Vector3.UP*0.6,Vector3(0.23,1.2,0.23),Color("#a77d72"))
-			var crown := MeshInstance3D.new()
-			var leaves := SphereMesh.new()
-			leaves.radial_segments = 6
-			leaves.rings = 3
-			var leaf_material := StandardMaterial3D.new()
-			leaf_material.albedo_color = Color("#eeb5ab")
-			leaves.material = leaf_material
-			crown.mesh = leaves
-			crown.scale = Vector3(1.8,2.1,1.8)
-			island.add_child(crown)
-			crown.position.y = 1.6
-		else:
-			for x in [-0.7,0.7]:
-				box(island,Vector3(x,1,0),Vector3(0.38,2,1.2),Color("#f0cda8"))
-			box(island,Vector3.UP*2.1,Vector3(2.2,0.32,1.65),Color("#c7919b"))
-			box(island,Vector3.UP*2.38,Vector3(1.65,0.24,1.2),Color("#ddacaa"))
 
 func create_pickup(base: Node3D, kind: int, cell: Vector2i, height_offset: float) -> void:
 	var pickup := Pickup.new()

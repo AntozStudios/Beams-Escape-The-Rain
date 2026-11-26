@@ -1,0 +1,59 @@
+newmtl wood
+Kd 0.58824 0.39216 0.28627
+Ks 0 0 0
+illum 1
+
+newmtl plank
+Kd 0.82353 0.61961 0.43922
+Ks 0 0 0
+illum 1
+
+newmtl gold
+Kd 1.00000 0.80784 0.39608
+Ks 0 0 0
+illum 1
+
+newmtl lift
+Kd 0.50980 0.45882 0.65098
+Ks 0 0 0
+illum 1
+
+newmtl sage
+Kd 0.63529 0.72549 0.66667
+Ks 0 0 0
+illum 1
+
+newmtl blossom
+Kd 0.87451 0.69804 0.67843
+Ks 0 0 0
+illum 1
+
+newmtl stone
+Kd 0.73725 0.65490 0.69804
+Ks 0 0 0
+illum 1
+
+newmtl grass
+Kd 0.73333 0.80784 0.68235
+Ks 0 0 0
+illum 1
+
+newmtl trim
+Kd 0.93333 0.81569 0.68235
+Ks 0 0 0
+illum 1
+
+newmtl roof
+Kd 0.74510 0.58824 0.62353
+Ks 0 0 0
+illum 1
+
+newmtl water
+Kd 0.56078 0.79216 0.78431
+Ks 0 0 0
+illum 1
+
+newmtl red
+Kd 0.77647 0.25098 0.32157
+Ks 0 0 0
+illum 1
