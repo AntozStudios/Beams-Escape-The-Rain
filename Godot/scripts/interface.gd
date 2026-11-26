@@ -34,11 +34,14 @@ func setup(owner_game) -> void:
 		var style := StyleBoxFlat.new()
 		var fills := {"normal":"524b69","hover":"665d7c","pressed":"403c55","disabled":"726e81"}
 		style.bg_color = Color(fills[state])
-		style.set_corner_radius_all(10)
+		style.set_corner_radius_all(18)
+		style.shadow_color = Color("#41345338")
+		style.shadow_size = 3
+		style.shadow_offset = Vector2(0,2)
 		root.theme.set_stylebox(state,"Button",style)
 	root.theme.set_color("font_outline_color","Label",Color("#403952"))
 	root.theme.set_constant("outline_size","Label",3)
-	root.theme.default_font = preload("res://art/gomarice_goma_block.ttf")
+	root.theme.default_font_size = 20
 	add_child(root)
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -49,17 +52,21 @@ func setup(owner_game) -> void:
 	shade.material.shader = preload("res://art/vignette.gdshader")
 	set_vignette(float(game.profile.value("Vignette",0.5)))
 	root.add_child(start)
-	start.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	start.text = "Tap to Start"
-	start.flat = true
+	start.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	start.offset_left = -110
+	start.offset_right = 110
+	start.offset_top = -36
+	start.offset_bottom = 28
+	start.text = "▶   Spielen"
+	start.flat = false
 	start.add_theme_font_size_override("font_size",28)
 	start.pressed.connect(func(): game.start_level(game.campaign_level))
 	root.add_child(map_button)
 	map_button.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	map_button.offset_left = -100
 	map_button.offset_right = 100
-	map_button.offset_top = 78
-	map_button.offset_bottom = 132
+	map_button.offset_top = 42
+	map_button.offset_bottom = 92
 	map_button.text = "Maps"
 	map_button.focus_mode = Control.FOCUS_NONE
 	map_button.pressed.connect(maps)
@@ -69,8 +76,8 @@ func setup(owner_game) -> void:
 	navigation.offset_right = -10
 	navigation.offset_top = 10
 	button(navigation,"?",instructions).modulate = Color("#68425a")
-	button(navigation,"A",items).modulate = Color("#395d56")
-	button(navigation,"P",account).modulate = Color("#454968")
+	button(navigation,"★",items).modulate = Color("#395d56")
+	button(navigation,"♙",account).modulate = Color("#454968")
 	var store := button(navigation,"",func(): OS.shell_open("https://play.google.com/store/apps/details?id=com.AntozStudios.BeamsEscapeTheRain&hl=de"))
 	store.icon = preload("res://art/PlayStoreIcon.png")
 	store.expand_icon = false
@@ -91,13 +98,13 @@ func setup(owner_game) -> void:
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	score.offset_top = 24
-	score.add_theme_font_size_override("font_size",50)
-	star_score.offset_top = 76
+	score.add_theme_font_size_override("font_size",32)
+	star_score.offset_top = 67
 	star_score.add_theme_font_size_override("font_size",28)
 	star_score.modulate = Color("#ffda8f")
 	life.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	life.modulate = Color("#b65162")
-	life.add_theme_font_size_override("font_size",84)
+	life.add_theme_font_size_override("font_size",27)
 	life.offset_left = 18
 	life.offset_top = 15
 	warning.offset_top = 145
@@ -131,11 +138,14 @@ func pad_move(direction: Vector2) -> void:
 
 func refresh() -> void:
 	pad.visible = game.armed and not game.dead and not game.level_complete and bool(game.profile.value("Direction buttons",false))
-	life.text = ".".repeat(game.lives)
+	life.text = "♥ ".repeat(game.lives)
 	life.visible = game.armed and not game.dead and not game.level_complete
-	score.text = str(game.campaign_level)
+	score.text = "Level %d" % game.campaign_level
 	score.visible = game.started and not game.dead and not game.level_complete
 	star_score.text = "\u2605 %d/3" % game.stars_collected
+	var section = game.sections.back()
+	if section.opened < section.seals.size():
+		star_score.text += "   ·   Siegel %d suchen" % (section.opened+1)
 	star_score.visible = game.armed and not game.dead and not game.level_complete
 	start.visible = not game.armed
 	map_button.visible = not game.armed

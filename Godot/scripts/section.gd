@@ -4,26 +4,26 @@ signal hit(harmful: bool, point: Vector3)
 signal heart_collected(heart: Node3D)
 signal star_collected(star: Node3D)
 
-const WIDTH := 7
+
 const SPAWN_HEIGHT := 25.0
 const GROUND := -4.0
 const Maps := preload("res://scripts/maps.gd")
 const Pickup := preload("res://scripts/pickup.gd")
-const TERRAIN := Maps.TERRAIN_COLORS
+var plan := Maps.new()
+var tiles: Array[MeshInstance3D] = []
 const GRACE := [2.0, 4.0, 6.0]
 const HEART := Pickup.Kind.HEART
 const STAR := Pickup.Kind.STAR
-var terrain: int
-var map_id: int
-var campaign: int
-var level_index: int
 var mirrored: bool
-var variation: int
+
 var length := 8
 var landing_heights := PackedFloat32Array()
 var player: MeshInstance3D
 var checkpoint: MeshInstance3D
 var rest_cells: Array[Vector2i] = []
+var seals: Array[Vector2i] = []
+var seal_marks: Array[Label3D] = []
+var opened := 0
 var warnings: Dictionary = {}
 var checkpoint_cell := Vector2i.ZERO
 var drops: Array[MeshInstance3D] = []
@@ -46,42 +46,65 @@ static func box(parent: Node3D, center: Vector3, dimensions: Vector3, color: Col
 	return body
 
 func elevation(cell: Vector2i) -> int:
-	return Maps.elevation(map_id,cell,mirrored,variation,length)
+		return plan.heights[cell.y] if plan.contains(cell) else -3
 
 func surface_y(cell: Vector2i) -> float:
-	return position.y + GROUND + elevation(cell)
+	return GROUND + elevation(cell)
 
 func terrain_at(cell: Vector2i) -> int:
-	return Maps.terrain_for_cell(campaign,level_index,cell,map_id,mirrored,length)
+	return plan.surfaces[cell.y]
 
-func build(index: int, surface: int, actor: MeshInstance3D, layout: int = Maps.CLASSIC, campaign_id: int = Maps.CLASSIC_CAMPAIGN) -> void:
+func build(index: int, actor: MeshInstance3D, world: int) -> void:
 	player = actor
-	terrain = surface
-	map_id = layout
-	campaign = campaign_id
-	level_index = index
-	variation = index % 3
-	mirrored = index % 2 == 1
-	length = Maps.section_length(index)
+	plan.generate(world,index)
+	length = plan.centers.size()
+	mirrored = index%2 == 1
 	rng.reset(index)
-	checkpoint_cell = choose_checkpoint()
-	var base := Node3D.new()
-	add_child(base)
-	var floor_center_z := 4.0 - float(length)*0.5
-	if map_id == Maps.CLASSIC:
-		box(base, Vector3(0,-10,floor_center_z), Vector3(WIDTH,10,length), Color("#ab889f"))
-		box(base,Vector3(0,GROUND-0.5,floor_center_z),Vector3(WIDTH,1,length),TERRAIN[terrain])
-	else:
-		build_mountain(base)
-	var path := checkpoint_route()
-	rest_cells.assign([Vector2i.ZERO, checkpoint_cell])
-	for fraction in [0.33, 0.67]:
-		var rest := path[roundi((path.size()-1)*float(fraction))]
-		rest_cells.append(rest)
-	for rest in rest_cells:
-		if rest != checkpoint_cell:
-			var marker := box(base,Vector3(rest.x,GROUND+elevation(rest)+0.012,3.5-rest.y),Vector3(0.48,0.02,0.48),Color("#d1ffe6"))
-			marker.rotation.y = PI/4
+	var base := self
+	checkpoint_cell = plan.center_at(length-1)
+	rest_cells.assign([Vector2i.ZERO,plan.center_at(length/2),checkpoint_cell])
+	var meshes: Array[BoxMesh] = []
+	for kind in Maps.COLORS.size():
+		var mesh := BoxMesh.new()
+		var material := StandardMaterial3D.new()
+		material.albedo_color = Maps.COLORS[kind]
+		if kind == 1:
+			var water := ShaderMaterial.new()
+			water.shader = preload("res://art/water.gdshader")
+			mesh.material = water
+		else:
+			mesh.material = material
+		meshes.append(mesh)
+	for row in length:
+		var center := plan.center_at(row)
+		for x in range(center.x-1,center.x+2):
+			var tile := MeshInstance3D.new()
+			tile.mesh = meshes[plan.surfaces[row]]
+			base.add_child(tile)
+			var depth := 1.5 + plan.heights[row]
+			tile.scale = Vector3(0.99,depth,0.99)
+			tile.position = Vector3(x,surface_y(center)-depth/2,3.5-row)
+			tiles.append(tile)
+	for i in range(4):
+		var cell := plan.center_at((i+1)*(length-1)/5)
+		cell.x += 1 if i%2 == 0 else -1
+		create_pickup(base,HEART if i == 1 else STAR,cell,0.85)
+	if index%3 == 2:
+		for row: int in [length-3,2]:
+			var cell := plan.center_at(row)
+			seals.append(cell)
+			rest_cells.append(cell)
+			var mark := Label3D.new()
+			mark.text = str(seals.size())
+			mark.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+			base.add_child(mark)
+			mark.position = Vector3(cell.x,surface_y(cell)+0.6,3.5-row)
+			seal_marks.append(mark)
+	for cell in rest_cells:
+		if cell != checkpoint_cell:
+			var plate := box(base,Vector3(cell.x,surface_y(cell)+0.025,3.5-cell.y),Vector3(0.62,0.05,0.62),Color("#b5f3de"))
+			plate.rotation.y = PI/4
+	build_scenery(base)
 	var rain_meshes: Array[BoxMesh] = []
 	for rain_color: Color in [Color("#8595b4"),Color("#c64052")]:
 		var rain_mesh := BoxMesh.new()
@@ -96,11 +119,10 @@ func build(index: int, surface: int, actor: MeshInstance3D, layout: int = Maps.C
 	for x in range(-3,4):
 		for row in length:
 			var point := Vector3(x, GROUND - 0.5, 3.5 - row)
-			if Vector2i(x,row) in rest_cells:
+			if not plan.contains(Vector2i(x,row)) or Vector2i(x,row) in rest_cells or rng.next_word() % 5 != 0:
 				continue
 			var red := rng.next_word() % 2
-			if map_id == Maps.RIDGE and x == 0 and row == length/2:
-				red = 1
+
 			var drop := MeshInstance3D.new()
 			drop.mesh = rain_meshes[red]
 			drop.position = Vector3(x,SPAWN_HEIGHT,point.z)
@@ -116,89 +138,44 @@ func build(index: int, surface: int, actor: MeshInstance3D, layout: int = Maps.C
 			speeds.append(rng.rain_speed())
 			velocities.append(0)
 	checkpoint = box(base, Vector3(checkpoint_cell.x, GROUND+elevation(checkpoint_cell)+0.025,3.5-checkpoint_cell.y), Vector3(1,0.025,1), Color.WHITE)
+	if not seals.is_empty():
+		checkpoint.mesh.material.albedo_color = Color("#766689")
 	checkpoint.mesh.material.albedo_texture = preload("res://art/EndTop.png")
-	spawn_heart(base)
-	spawn_stars(base)
-	if index > 1:
-		base.position.y = -10.47
-		create_tween().set_trans(Tween.TRANS_SINE).tween_property(base,"position:y",0,0.5)
 
-func build_mountain(base: Node3D) -> void:
-	var column_meshes: Array[BoxMesh] = []
-	for terrain_id in TERRAIN.size():
-		var stone := StandardMaterial3D.new()
-		stone.albedo_color = Maps.TERRAIN_SIDE_COLORS[terrain_id]
-		var column_mesh := BoxMesh.new()
-		column_mesh.material = stone
-		column_meshes.append(column_mesh)
-	var cap_meshes := {}
-	for row in length:
-		for x in range(-3,4):
-			var cell := Vector2i(x,row)
-			var height := elevation(cell)
-			var terrain_id := terrain_at(cell)
-			var top := GROUND + height
-			var depth := top - 0.18 + 15.0
-			var column := MeshInstance3D.new()
-			column.mesh = column_meshes[terrain_id]
-			base.add_child(column)
-			column.add_to_group("mountain_wall")
-			column.set_meta("occlusion_alpha",1.0)
-			column.scale.y = depth
-			column.position = Vector3(x,top-0.18-depth/2.0,3.5-row)
-			var cap_key := terrain_id * 16 + height
-			if not cap_meshes.has(cap_key):
-				var cap := BoxMesh.new()
-				cap.size = Vector3(1,0.18,1)
-				var material := StandardMaterial3D.new()
-				var color: Color = TERRAIN[terrain_id].lightened(clampf(height*0.09,0,0.4))
-				if height == 6:
-					color = Color("#c4b2cf")
-				material.albedo_color = color
-				if terrain_id == 1:
-					var water := ShaderMaterial.new()
-					water.shader = preload("res://art/water.gdshader")
-					cap.material = water
-				else:
-					cap.material = material
-				cap_meshes[cap_key] = cap
-			var tile := MeshInstance3D.new()
-			tile.mesh = cap_meshes[cap_key]
-			base.add_child(tile)
-			tile.add_to_group("mountain_wall")
-			tile.set_meta("occlusion_alpha",1.0)
-			tile.position = Vector3(x,top-0.09,3.5-row)
+func activate_seal(cell: Vector2i) -> bool:
+	if opened >= seals.size() or cell != seals[opened]:
+		return false
+	seal_marks[opened].text = "\u2713"
+	opened += 1
+	if opened == seals.size():
+		checkpoint.mesh.material.albedo_color = Color.WHITE
+	return true
 
-func spawn_stars(base: Node3D) -> void:
-	var cells := pickup_route_cells()
-	if cells.size() < 4:
-		return
-	for i in [0,2,3]:
-		create_pickup(base,STAR,cells[i],0.95)
-
-func spawn_heart(base: Node3D) -> void:
-	var cells := pickup_route_cells()
-	if cells.size() < 4:
-		return
-	create_pickup(base,HEART,cells[1],0.85)
-
-func pickup_route_cells() -> Array[Vector2i]:
-	var route := checkpoint_route()
-	var cells: Array[Vector2i] = []
-	if route.size() < 10:
-		return cells
-	for i in range(4):
-		var route_index := roundi(float(i)*float(route.size()-1)/3.0)
-		var chosen := route[mini(route_index,route.size()-2)]
-		# Allow a short, reversible detour from each star anchor.
-		if i != 1:
-			for step: Vector2i in [Vector2i.LEFT,Vector2i.RIGHT]:
-				var branch := chosen + step
-				if absi(branch.x) <= 3 and branch != Vector2i.ZERO and not route.has(branch) and not cells.has(branch) and absi(elevation(branch)-elevation(chosen)) <= 1:
-					chosen = branch
-					break
-		cells.append(chosen)
-	return cells
+func build_scenery(base: Node3D) -> void:
+	for i in range(2):
+		var island := Node3D.new()
+		base.add_child(island)
+		island.position = Vector3(8 + (i%2)*3,GROUND-2,2-i*10)
+		box(island,Vector3.DOWN*2,Vector3(2.7,4,2.4),Color("#b5a2b5"))
+		box(island,Vector3.ZERO,Vector3(2.8,0.22,2.5),Color("#c5d6af"))
+		if (i == 0) == mirrored:
+			box(island,Vector3.UP*0.6,Vector3(0.23,1.2,0.23),Color("#a77d72"))
+			var crown := MeshInstance3D.new()
+			var leaves := SphereMesh.new()
+			leaves.radial_segments = 6
+			leaves.rings = 3
+			var leaf_material := StandardMaterial3D.new()
+			leaf_material.albedo_color = Color("#eeb5ab")
+			leaves.material = leaf_material
+			crown.mesh = leaves
+			crown.scale = Vector3(1.8,2.1,1.8)
+			island.add_child(crown)
+			crown.position.y = 1.6
+		else:
+			for x in [-0.7,0.7]:
+				box(island,Vector3(x,1,0),Vector3(0.38,2,1.2),Color("#f0cda8"))
+			box(island,Vector3.UP*2.1,Vector3(2.2,0.32,1.65),Color("#c7919b"))
+			box(island,Vector3.UP*2.38,Vector3(1.65,0.24,1.2),Color("#ddacaa"))
 
 func create_pickup(base: Node3D, kind: int, cell: Vector2i, height_offset: float) -> void:
 	var pickup := Pickup.new()
@@ -212,49 +189,6 @@ func _on_pickup_collected(pickup: Node3D) -> void:
 		heart_collected.emit(pickup)
 	else:
 		star_collected.emit(pickup)
-
-func choose_checkpoint() -> Vector2i:
-	var x_preferences := [-2,2,1,-1,0,3,-3]
-	var preferred_x: int = x_preferences[posmod(level_index-1,x_preferences.size())]
-	var preferred_row := length-1-posmod(level_index,2)
-	var best_cell := Vector2i(0,length-1)
-	var best_score := INF
-	for row in range(length-2,length):
-		for x in range(-3,4):
-			var candidate := Vector2i(x,row)
-			var route := route_to(candidate)
-			if route.size() < 10:
-				continue
-			var score := float(absi(x-preferred_x)*3 + absi(row-preferred_row)*2) - float(route.size())*0.01
-			if score < best_score:
-				best_score = score
-				best_cell = candidate
-	return best_cell
-
-func checkpoint_route() -> Array[Vector2i]:
-	return route_to(checkpoint_cell)
-
-func route_to(goal: Vector2i) -> Array[Vector2i]:
-	var start := Vector2i.ZERO
-	var frontier: Array[Vector2i] = [start]
-	var parent := {start:start}
-	while not frontier.is_empty():
-		var cell: Vector2i = frontier.pop_front()
-		if cell == goal:
-			var route: Array[Vector2i] = []
-			while cell != start:
-				route.push_front(cell)
-				cell = parent[cell]
-			return route
-		for step: Vector2i in [Vector2i.LEFT,Vector2i.RIGHT,Vector2i.UP,Vector2i.DOWN]:
-			var next := cell + step
-			if absi(next.x) > 3 or next.y < 0 or next.y >= length or parent.has(next):
-				continue
-			if absi(elevation(cell)-elevation(next)) > 1:
-				continue
-			parent[next] = cell
-			frontier.append(next)
-	return []
 
 func consume_checkpoint() -> void:
 	checkpoint.queue_free()

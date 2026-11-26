@@ -73,6 +73,7 @@ func _ready() -> void:
 	player.add_child(lamp)
 	lamp.light_energy = 1.47
 	lamp.omni_range = 6.44
+	camera.size = 16
 	create_stars()
 	map_id = clampi(int(profile.value("map",Maps.CLASSIC)),0,Maps.NAMES.size()-1)
 	campaign_level = clampi(int(profile.value("current_level_%d" % map_id,1)),1,Maps.MAX_LEVELS)
@@ -136,11 +137,11 @@ func apply_settings() -> void:
 	ui.set_vignette(float(profile.value("Vignette",0.5)))
 
 func add_section() -> void:
-	var surface := Maps.surface_for_level(map_id,campaign_level)
-	var layout := Maps.layout_for_level(map_id,campaign_level)
+
+
 	var section := Section.new()
 	add_child(section)
-	section.build(campaign_level,surface,player,layout,map_id)
+	section.build(campaign_level,player,map_id)
 	section.hit.connect(on_hit)
 	section.heart_collected.connect(on_heart_collected)
 	section.star_collected.connect(on_star_collected)
@@ -230,7 +231,7 @@ func move(step: Vector2i) -> void:
 	if absi(step.x)+absi(step.y) != 1:
 		return
 	var next := cell + step
-	if absi(next.x) > 3 or (step.y != 0 and (next.y < 0 or next.y >= sections.back().length)):
+	if not sections.back().plan.contains(next):
 		return
 	var target_section: Section = sections.back()
 	rise = target_section.surface_y(next) + 0.5 - player.position.y
@@ -270,7 +271,11 @@ func _physics_process(delta: float) -> void:
 		player.transform = Transform3D(rotation_basis,pivot+rotation_basis*(origin-pivot)+Vector3.UP*lift)
 		if roll_elapsed >= move_time:
 			player.transform = Transform3D(Basis.IDENTITY,origin+direction+Vector3.UP*rise)
-			if cell == sections.back().checkpoint_cell:
+			var current: Section = sections.back()
+			if current.activate_seal(cell):
+				play("checkPoint",0.06)
+				ui.refresh()
+			if cell == current.checkpoint_cell and current.opened == current.seals.size():
 				sections.back().consume_checkpoint()
 				level_complete = true
 				locked_until = 0.0
@@ -339,33 +344,11 @@ func _process(delta: float) -> void:
 		update_occluded_mountain_parts(delta+0.04)
 
 func update_occluded_mountain_parts(delta: float) -> void:
-	var occluded: Dictionary = {}
-	if map_id != Maps.CLASSIC and player.visible:
-		var ray := player.global_position-camera.global_position
-		var distance_to_player := ray.length()-0.55
-		if distance_to_player > 0:
-			for section: Section in sections:
-				for node: Node in section.find_children("*","MeshInstance3D",true,false):
-					if not node.is_in_group("mountain_wall"):
-						continue
-					var wall := node as MeshInstance3D
-					var bounds: AABB = wall.global_transform * wall.mesh.get_aabb()
-					if bounds.end.y <= player.global_position.y-0.45:
-						continue
-					var hit: Variant = bounds.intersects_ray(camera.global_position,ray.normalized())
-					if hit != null and camera.global_position.distance_to(hit) < distance_to_player:
-						occluded[wall.get_instance_id()] = wall
-
-	for section: Section in sections:
-		for node: Node in section.find_children("*","MeshInstance3D",true,false):
-			if not node.is_in_group("mountain_wall"):
-				continue
-			var wall := node as MeshInstance3D
-			var alpha: float = float(wall.get_meta("occlusion_alpha"))
-			var target_alpha := 0.06 if occluded.has(wall.get_instance_id()) else 1.0
-			alpha = move_toward(alpha,target_alpha,delta*7.0)
-			wall.set_meta("occlusion_alpha",alpha)
-			wall.transparency = 1.0-alpha
+	var forward := -camera.global_basis.z
+	for wall in sections.back().tiles:
+		var bounds: AABB = wall.global_transform * wall.mesh.get_aabb()
+		var blocked := bounds.end.y > player.position.y-0.45 and bounds.grow(0.25).intersects_segment(player.position-forward*60,player.position-forward*0.6) != null
+		wall.transparency = move_toward(wall.transparency,0.94 if blocked else 0.0,delta*7)
 
 func burst(point: Vector3, color: Color, count: int) -> void:
 	var particles := CPUParticles3D.new()
