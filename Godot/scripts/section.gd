@@ -108,6 +108,7 @@ func build_mountain(base: Node3D) -> void:
 			column.mesh = column_mesh
 			base.add_child(column)
 			column.add_to_group("mountain_wall")
+			column.set_meta("occlusion_alpha",1.0)
 			column.scale.y = depth
 			column.position = Vector3(x,top-0.18-depth/2.0,3.5-row)
 			if not cap_meshes.has(height):
@@ -125,6 +126,8 @@ func build_mountain(base: Node3D) -> void:
 			var tile := MeshInstance3D.new()
 			tile.mesh = cap_meshes[height]
 			base.add_child(tile)
+			tile.add_to_group("mountain_wall")
+			tile.set_meta("occlusion_alpha",1.0)
 			tile.position = Vector3(x,top-0.09,3.5-row)
 
 func spawn_heart(base: Node3D, index: int) -> void:
