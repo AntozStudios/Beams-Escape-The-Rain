@@ -9,6 +9,8 @@ const SPAWN_HEIGHT := 25.0
 const GROUND := -4.0
 const Maps := preload("res://scripts/maps.gd")
 const Pickup := preload("res://scripts/pickup.gd")
+const SidePuzzle := preload("res://scripts/side_puzzle.gd")
+var puzzle := SidePuzzle.new()
 var plan := Maps.new()
 var tiles: Array[MeshInstance3D] = []
 const GRACE := [2.0, 4.0, 6.0]
@@ -51,6 +53,8 @@ static func box(parent: Node3D, center: Vector3, dimensions: Vector3, color: Col
 	return body
 
 func elevation(cell: Vector2i) -> int:
+	if puzzle.is_inside_tree() and puzzle.is_branch(cell):
+		return puzzle.height_at(cell)
 	if cell.y == plan.lift_row and plan.contains(cell):
 		return plan.heights[cell.y + (1 if lift_high else -1)]
 	return plan.heights[cell.y] if plan.contains(cell) else -3
@@ -103,9 +107,14 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 			tiles.append(tile)
 	if plan.has_pallet:
 		build_pallet()
+	var anchor := plan.center_at(length-4) + Vector2i.LEFT
+	add_child(puzzle)
+	puzzle.build(index,anchor,plan.heights[anchor.y],GROUND,plan.center_at(anchor.y+1)+Vector2i.LEFT)
 	for i in range(4):
 		var cell := plan.center_at((i+1)*(length-1)/5)
 		cell.x += 1 if i%2 == 0 else -1
+		if i == 3:
+			cell = puzzle.cell(4)
 		create_pickup(base,HEART if i == 1 else STAR,cell,0.85)
 	if index%3 == 2:
 		for row: int in [length-3,2]:
@@ -140,14 +149,15 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 		material.emission_energy_multiplier = 0.25
 		rain_mesh.material = material
 		rain_meshes.append(rain_mesh)
-	for x in range(-3,4):
+	for x in range(mini(-3,puzzle.cell(3).x),4):
 		for row in length:
 			var point := Vector3(x, GROUND - 0.5, 3.5 - row)
 			if plan.has_pallet and x == 0 and row <= 3:
 				continue
-			if not plan.contains(Vector2i(x,row)) or Vector2i(x,row) in rest_cells or rng.next_word() % 5 != 0:
+			var roof_rain := puzzle.kind == SidePuzzle.Kind.SHELTER and Vector2i(x,row) == puzzle.cell(3)
+			if not roof_rain and (not plan.contains(Vector2i(x,row)) or Vector2i(x,row) in rest_cells or rng.next_word() % 5 != 0):
 				continue
-			var red := rng.next_word() % 2
+			var red := 1 if roof_rain else rng.next_word() % 2
 
 			var drop := MeshInstance3D.new()
 			drop.mesh = rain_meshes[red]
@@ -245,6 +255,12 @@ func _physics_process(delta: float) -> void:
 			warnings[i].visible = drop.position.y - landing_heights[i] < velocities[i]*0.8 + 1.0
 		var p := player.to_local(drop.global_position)
 		var contact := player.visible and absf(p.x) <= 0.60 and absf(p.z) <= 0.60 and absf(p.y) <= 0.75
+		var covered := puzzle.kind == SidePuzzle.Kind.SHELTER and puzzle.active and is_equal_approx(drop.position.x,float(puzzle.cell(3).x)) and is_equal_approx(drop.position.z,3.5-puzzle.entrance.y)
+		if covered and drop.position.y <= landing_heights[i]+1.75:
+			drop.hide()
+			warnings[i].hide()
+			waiting += 1
+			continue
 		if contact:
 			hit.emit(bool(harmful[i]),drop.global_position)
 		elif drop.position.y <= landing_heights[i] + 0.25:

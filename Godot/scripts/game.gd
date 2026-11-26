@@ -234,10 +234,12 @@ func move(step: Vector2i) -> void:
 	if absi(step.x)+absi(step.y) != 1:
 		return
 	var next := cell + step
-	if not sections.back().plan.contains(next):
+	if not platform.plan.contains(next) and not platform.puzzle.is_branch(next):
+		return
+	if not platform.puzzle.can_cross(cell,next):
 		return
 	var roll_duration := maxf(0.075,ROLL_TIME*pow(0.97,float(level)))
-	if not platform.push_pallet(cell,next,roll_duration):
+	if not platform.puzzle.try_push(cell,next) or not platform.push_pallet(cell,next,roll_duration):
 		return
 	rise = platform.surface_y(next) + 0.5 - player.position.y
 	if absf(rise) > 1.01:
@@ -278,6 +280,7 @@ func _physics_process(delta: float) -> void:
 			var current: Section = sections.back()
 			if cell.y == current.plan.lift_row:
 				current.ride_lift(cell)
+			current.puzzle.landed(cell)
 			if current.activate_seal(cell):
 				play("checkPoint",0.06)
 				ui.refresh()
