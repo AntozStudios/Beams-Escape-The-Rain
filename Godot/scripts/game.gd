@@ -75,14 +75,15 @@ func _ready() -> void:
 func create_stars() -> void:
 	var stars := CPUParticles3D.new()
 	camera.add_child(stars)
-	stars.position = Vector3(-3.18966,3.10597,-42.15969)
-	stars.amount = 50
-	stars.lifetime = 5
+	var viewport_aspect := float(get_viewport().size.x) / maxf(1.0,float(get_viewport().size.y))
+	stars.position = Vector3(0,0,-100)
+	stars.amount = 100
+	stars.lifetime = 8
 	stars.gravity = Vector3.ZERO
 	stars.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
-	stars.emission_box_extents = Vector3.ONE*5
-	stars.scale_amount_min = 0.3
-	stars.scale_amount_max = 1
+	stars.emission_box_extents = Vector3(camera.size*viewport_aspect*0.58,camera.size*0.58,0.1)
+	stars.scale_amount_min = 0.2
+	stars.scale_amount_max = 0.55
 	var sprite := QuadMesh.new()
 	sprite.size = Vector2.ONE*0.1
 	var material := StandardMaterial3D.new()
