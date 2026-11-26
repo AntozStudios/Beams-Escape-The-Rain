@@ -7,8 +7,8 @@ uniform vec4 shallow : source_color = vec4(0.42, 0.79, 0.84, 1.0);
 uniform vec4 sand : source_color = vec4(0.94, 0.91, 0.84, 1.0);
 uniform vec4 wet_sand : source_color = vec4(0.77, 0.74, 0.66, 1.0);
 uniform vec4 dune : source_color = vec4(0.88, 0.78, 0.64, 1.0);
-uniform vec4 meadow : source_color = vec4(0.27, 0.60, 0.35, 1.0);
-uniform vec4 meadow_light : source_color = vec4(0.44, 0.73, 0.42, 1.0);
+uniform vec4 meadow : source_color = vec4(0.20, 0.55, 0.27, 1.0);
+uniform vec4 meadow_light : source_color = vec4(0.48, 0.78, 0.36, 1.0);
 uniform vec4 reflection : source_color = vec4(0.78, 0.66, 0.72, 1.0);
 uniform vec4 foam : source_color = vec4(0.91, 0.98, 0.99, 1.0);
 uniform vec2 islet_center;
@@ -34,6 +34,30 @@ float glints(vec2 p) {
 		* smoothstep(0.56, 0.84, seed) * (0.55 + 0.45*sin(TIME*0.48 + seed*21.0));
 }
 
+float blade_mark(vec2 local, vec2 cell, float id) {
+	float seed = fract(sin(dot(cell+vec2(id*17.13,id*31.71),vec2(41.7,17.3)))*1738.53);
+	float x = mix(-0.42,0.42,fract(seed*13.71));
+	float lean = mix(-0.26,0.26,fract(seed*7.31));
+	vec2 a = vec2(x,-0.48+0.12*fract(seed*4.27));
+	vec2 b = vec2(x+lean,0.22+0.27*fract(seed*9.17));
+	vec2 direction = b-a;
+	float along = clamp(dot(local-a,direction)/dot(direction,direction),0.0,1.0);
+	float distance_to_blade = length(local-(a+direction*along));
+	float width = mix(0.052,0.009,along);
+	float aa = max(fwidth(distance_to_blade),0.006);
+	return 1.0-smoothstep(width-aa,width+aa,distance_to_blade);
+}
+
+vec3 grass_detail(vec3 base, vec2 p) {
+	vec2 grid = p*vec2(3.8,3.8);
+	vec2 cell = floor(grid);
+	vec2 local = fract(grid)-0.5;
+	float stems = max(max(blade_mark(local,cell,0.0),blade_mark(local,cell,1.0)),blade_mark(local,cell,2.0));
+	float seed = fract(sin(dot(cell,vec2(61.3,29.7)))*8191.7);
+	vec3 blade = mix(vec3(0.12,0.38,0.18),vec3(0.76,0.91,0.49),smoothstep(0.28,0.82,seed));
+	return mix(base,blade,stems*0.88);
+}
+
 vec3 beach_color(float inland, vec2 p, float aa) {
 	float tide = inland + 0.16*sin(p.y*1.3+phase);
 	vec3 beach = mix(wet_sand.rgb,sand.rgb,smoothstep(0.1,1.05,tide));
@@ -43,7 +67,17 @@ vec3 beach_color(float inland, vec2 p, float aa) {
 
 	float cover = smoothstep(1.20-aa,1.20+aa,inland);
 	float breeze = sin(dot(p,vec2(0.72,0.32))-TIME*1.1);
-	vec3 grass = mix(meadow.rgb,meadow_light.rgb,0.42+0.2*sin(p.y*0.7)+0.08*breeze);
+	vec2 cell = floor(p*vec2(0.24,0.17));
+	vec2 f = fract(p*vec2(0.24,0.17));
+	f = f*f*(3.0-2.0*f);
+	float a = fract(sin(dot(cell,vec2(127.1,311.7)))*43758.5453);
+	float b = fract(sin(dot(cell+vec2(1.0,0.0),vec2(127.1,311.7)))*43758.5453);
+	float c = fract(sin(dot(cell+vec2(0.0,1.0),vec2(127.1,311.7)))*43758.5453);
+	float d = fract(sin(dot(cell+vec2(1.0,1.0),vec2(127.1,311.7)))*43758.5453);
+	float patches = mix(mix(a,b,f.x),mix(c,d,f.x),f.y);
+	float sunlit = 0.36+0.38*smoothstep(0.18,0.86,patches)+0.11*sin(p.y*0.7)+0.07*breeze;
+	vec3 grass = mix(meadow.rgb*vec3(0.84,0.96,0.78),meadow_light.rgb*vec3(1.03,1.0,0.88),sunlit);
+	grass = grass_detail(grass,p);
 	return mix(beach,grass,cover);
 }
 

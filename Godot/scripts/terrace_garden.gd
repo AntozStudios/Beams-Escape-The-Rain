@@ -4,6 +4,8 @@ const SHORE := preload("res://art/models/lakeshore.obj")
 const TERRACE := preload("res://art/models/terrace.obj")
 const PAVILION := preload("res://art/models/pavilion.obj")
 const BLOSSOM := preload("res://art/models/tree_blossom.obj")
+const SAGE := preload("res://art/models/tree_sage.obj")
+const ROCK := preload("res://art/models/meadow_rock.obj")
 const RUIN := preload("res://art/models/coastal_ruin.obj")
 
 func build(plan, level: int, earth: bool) -> void:
@@ -31,24 +33,58 @@ func build_meadows(level: int, middle: float, span: float) -> void:
 	rng.seed = level+901
 	var flowers: Array[Transform3D] = []
 	var transforms: Array[Transform3D] = []
+	var rocks: Array[Transform3D] = []
 	for side: int in [-1,1]:
-		for group in 48:
-			var z := middle + ((group+rng.randf())/48.0-0.5)*span
-			var inland := rng.randf_range(2.0,11.0)
-			for tuft in 5:
-				var along := z+rng.randfn(0,0.44)
+		for group in 4:
+			var z := middle + (float(group)+0.5)*span/4.0 + sin(float(group)*2.1+float(side))*0.65
+			var bank := -8.8+2.7*sin(z*0.21+phase)+0.9*cos(z*0.46) if side < 0 else 10.8+3.4*cos(z*0.16-phase)
+			var tree_mesh: Mesh = BLOSSOM if posmod(group+level+side,3) == 0 else SAGE
+			var tree := MeshInstance3D.new()
+			tree.mesh = tree_mesh
+			tree.position = Vector3(bank+side*(3.0+0.35*posmod(group,2)),0.05,z-middle)
+			tree.scale = Vector3.ONE*(1.0+0.16*posmod(group+level,4))
+			tree.rotation.y = float(posmod(group*3+level,8))*PI/4.0
+			tree.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+			add_child(tree)
+	var spacing := 0.23
+	var meadow_start := 1.65
+	var meadow_width := 34.0
+	var field_span := maxf(span,42.0)
+	var columns := ceili(meadow_width/spacing)
+	var rows := ceili(field_span/spacing)
+	for side: int in [-1,1]:
+		for row in rows:
+			var along := middle-field_span*0.5+(float(row)+0.5+rng.randf_range(-0.38,0.38))*spacing
+			var bank := -8.8+2.7*sin(along*0.21+phase)+0.9*cos(along*0.46)
+			if side > 0:
+				bank = 10.8+3.4*cos(along*0.16-phase)
+			for column in columns:
+				var inland := meadow_start+(float(column)+0.5+rng.randf_range(-0.38,0.38))*spacing
+				var point := Vector2(bank+side*inland,along)
+				var basis := Basis(Vector3.UP,rng.randf()*TAU).scaled(Vector3.ONE*rng.randf_range(0.78,1.3))
+				transforms.append(Transform3D(basis,Vector3(point.x,0.015,point.y-middle)))
+				if row % 19 == 0 and column % 23 == 0:
+					flowers.append(Transform3D(basis,Vector3(point.x+0.08,0.015,point.y-middle)))
+	for side: int in [-1,1]:
+		for cluster in 18:
+			var cluster_z := middle+rng.randf_range(-field_span*0.46,field_span*0.46)
+			var cluster_inland := rng.randf_range(3.0,meadow_width-1.0)
+			for stone in 3:
+				var along := cluster_z+rng.randfn(0.0,0.42)
+				var inland := cluster_inland+rng.randfn(0.0,0.48)
 				var bank := -8.8+2.7*sin(along*0.21+phase)+0.9*cos(along*0.46)
 				if side > 0:
 					bank = 10.8+3.4*cos(along*0.16-phase)
-				var point := Vector2(bank+side*maxf(1.7,inland+rng.randfn(0,0.29)),along)
-				var basis := Basis(Vector3.UP,rng.randf()*TAU).scaled(Vector3.ONE*rng.randf_range(0.62,1.15))
-				transforms.append(Transform3D(basis,Vector3(point.x,0.015,point.y-middle)))
-				if group % 5 == 0 and tuft < 3:
-					flowers.append(Transform3D(basis,Vector3(point.x+0.08,0.015,point.y-middle)))
+				var scale_factor := rng.randf_range(0.28,0.56)
+				var rock_size := Vector3(scale_factor*rng.randf_range(0.8,1.4),scale_factor*rng.randf_range(0.72,1.2),scale_factor*rng.randf_range(0.8,1.3))
+				var rock_basis := Basis(Vector3.UP,rng.randf()*TAU).scaled(rock_size)
+				var rock_x := bank+side*clampf(inland,meadow_start,meadow_width-0.4)
+				rocks.append(Transform3D(rock_basis,Vector3(rock_x,rock_size.y*0.30+0.01,along-middle)))
 	var wind := ShaderMaterial.new()
 	wind.shader = preload("res://art/meadow_grass.gdshader")
 	plant_batch(preload("res://art/models/coastal_grass.obj"),transforms,wind)
 	plant_batch(preload("res://art/models/coastal_daisy.obj"),flowers)
+	plant_batch(ROCK,rocks)
 
 func plant_batch(asset: Mesh, transforms: Array[Transform3D], paint: Material = null) -> void:
 	if transforms.is_empty():
