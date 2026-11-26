@@ -228,6 +228,9 @@ func screen_step(input_direction: Vector2, view: Basis) -> Vector2i:
 func move(step: Vector2i) -> void:
 	if dead or level_complete or not armed or locked_until > 0 or roll_elapsed < move_time:
 		return
+	var platform: Section = sections.back()
+	if platform.ride and platform.ride.is_running():
+		return
 	if absi(step.x)+absi(step.y) != 1:
 		return
 	var next := cell + step
@@ -272,6 +275,8 @@ func _physics_process(delta: float) -> void:
 		if roll_elapsed >= move_time:
 			player.transform = Transform3D(Basis.IDENTITY,origin+direction+Vector3.UP*rise)
 			var current: Section = sections.back()
+			if cell.y == current.plan.lift_row:
+				current.ride_lift(cell)
 			if current.activate_seal(cell):
 				play("checkPoint",0.06)
 				ui.refresh()
@@ -332,7 +337,7 @@ func _process(delta: float) -> void:
 	sunlight.light_energy = 0.85 + 0.045*sin(Time.get_ticks_msec()*0.00018)
 	var target := player.position
 	if map_id == Maps.CLASSIC:
-		target.y = START.y
+		target.y = START.y if not started else player.position.y
 	var follow := float(profile.value("Follow Player",1))
 	camera_focus = camera_focus.lerp(target,clampf(delta*follow,0,1)) if follow > 0 else target
 	orbit = lerp_angle(orbit,target_orbit,1.0-exp(-5.0*delta))
@@ -390,7 +395,7 @@ func on_heart_collected(heart: Node3D) -> void:
 	heart.set_meta("collected",true)
 	heart.queue_free()
 	play("checkPoint",0.11)
-	burst(player.position,Color(1,0.12,0.25),18)
+	burst(player.position,Maps.RAIN_RED,18)
 	ui.refresh()
 
 func on_star_collected(star: Node3D) -> void:
@@ -432,6 +437,7 @@ func die() -> void:
 func revive(amount: int) -> void:
 	if not dead or amount < 1 or revivals >= 3:
 		return
+	sections.back().reset_lift()
 	revivals += 1
 	dead = false
 	lives = amount

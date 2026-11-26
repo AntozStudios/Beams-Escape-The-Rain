@@ -14,6 +14,9 @@ var tiles: Array[MeshInstance3D] = []
 const GRACE := [2.0, 4.0, 6.0]
 const HEART := Pickup.Kind.HEART
 const STAR := Pickup.Kind.STAR
+var lift_deck: MeshInstance3D
+var lift_high := false
+var ride: Tween
 var mirrored: bool
 
 var length := 8
@@ -46,7 +49,9 @@ static func box(parent: Node3D, center: Vector3, dimensions: Vector3, color: Col
 	return body
 
 func elevation(cell: Vector2i) -> int:
-		return plan.heights[cell.y] if plan.contains(cell) else -3
+	if cell.y == plan.lift_row and plan.contains(cell):
+		return plan.heights[cell.y + (1 if lift_high else -1)]
+	return plan.heights[cell.y] if plan.contains(cell) else -3
 
 func surface_y(cell: Vector2i) -> float:
 	return GROUND + elevation(cell)
@@ -77,6 +82,13 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 		meshes.append(mesh)
 	for row in length:
 		var center := plan.center_at(row)
+		if row == plan.lift_row:
+			var dock := Vector3(center.x,surface_y(center),3.5-row)
+			lift_deck = box(base,dock-Vector3.UP*0.12,Vector3(1,0.24,1),Color("#8275a6"))
+			for side in [-1,1]:
+				box(lift_deck,Vector3(side*0.38,0.13,0),Vector3(0.08,0.025,0.85),Color("#ffda8f"))
+			box(base,dock-Vector3.UP*1.7,Vector3(0.32,3,0.32),Color("#ad98ad"))
+			continue
 		for x in range(center.x-1,center.x+2):
 			var tile := MeshInstance3D.new()
 			tile.mesh = meshes[plan.surfaces[row]]
@@ -101,12 +113,12 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 			mark.position = Vector3(cell.x,surface_y(cell)+0.6,3.5-row)
 			seal_marks.append(mark)
 	for cell in rest_cells:
-		if cell != checkpoint_cell:
+		if cell != checkpoint_cell and cell.y != plan.lift_row:
 			var plate := box(base,Vector3(cell.x,surface_y(cell)+0.025,3.5-cell.y),Vector3(0.62,0.05,0.62),Color("#b5f3de"))
 			plate.rotation.y = PI/4
 	build_scenery(base)
 	var rain_meshes: Array[BoxMesh] = []
-	for rain_color: Color in [Color("#8595b4"),Color("#c64052")]:
+	for rain_color: Color in [Color("#8595b4"),Maps.RAIN_RED]:
 		var rain_mesh := BoxMesh.new()
 		rain_mesh.size = Vector3(0.2,0.5,0.2)
 		var material := StandardMaterial3D.new()
@@ -141,6 +153,20 @@ func build(index: int, actor: MeshInstance3D, world: int) -> void:
 	if not seals.is_empty():
 		checkpoint.mesh.material.albedo_color = Color("#766689")
 	checkpoint.mesh.material.albedo_texture = preload("res://art/EndTop.png")
+
+func ride_lift(cell: Vector2i) -> void:
+	lift_high = not lift_high
+	var top := surface_y(cell)
+	ride = create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
+	ride.set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	ride.tween_property(lift_deck,"position:y",top-0.12,0.85)
+	ride.tween_property(player,"position:y",top+0.5,0.85)
+
+func reset_lift() -> void:
+	if ride:
+		ride.kill()
+	lift_high = false
+	lift_deck.position.y = surface_y(plan.center_at(plan.lift_row))-0.12
 
 func activate_seal(cell: Vector2i) -> bool:
 	if opened >= seals.size() or cell != seals[opened]:
