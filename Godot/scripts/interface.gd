@@ -65,11 +65,13 @@ func setup(owner_game) -> void:
 	button(navigation,"P",account).modulate = Color(0,0.524,1)
 	var store := button(navigation,"",func(): OS.shell_open("https://play.google.com/store/apps/details?id=com.AntozStudios.BeamsEscapeTheRain&hl=de"))
 	store.icon = preload("res://art/PlayStoreIcon.png")
-	store.expand_icon = true
+	store.expand_icon = false
+	store.add_theme_constant_override("icon_max_width",18)
 	store.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var gear := button(navigation,"",settings)
 	gear.icon = preload("res://art/512x512.png")
-	gear.expand_icon = true
+	gear.expand_icon = false
+	gear.add_theme_constant_override("icon_max_width",18)
 	gear.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	for option: Button in navigation.get_children():
 		option.flat = true

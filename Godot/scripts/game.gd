@@ -41,6 +41,7 @@ var ambience: AudioStreamPlayer
 @onready var camera_focus := camera.position - CAMERA_OFFSET
 var orbit := 0.0
 var target_orbit := 0.0
+var clearance_orbit := 0.0
 
 func _ready() -> void:
 	add_child(mobile)
@@ -265,9 +266,43 @@ func _process(delta: float) -> void:
 		target.y = START.y
 	var follow := float(profile.value("Follow Player",1))
 	camera_focus = camera_focus.lerp(target,clampf(delta*follow,0,1)) if follow > 0 else target
-	orbit = lerp_angle(orbit,target_orbit,1.0-exp(-5.0*delta))
+	orbit = lerp_angle(orbit,target_orbit+clearance_orbit,1.0-exp(-4.0*delta))
 	camera.position = camera_focus + CAMERA_OFFSET.rotated(Vector3.UP,orbit)
 	camera.rotation.y = home_yaw + orbit
+	update_camera_clearance()
+
+func camera_orbit_is_clear(candidate_orbit: float) -> bool:
+	var candidate_position := camera_focus + CAMERA_OFFSET.rotated(Vector3.UP,candidate_orbit)
+	var ray := player.global_position-candidate_position
+	var player_distance := ray.length()-0.65
+	if player_distance <= 0:
+		return true
+	var ray_direction := ray.normalized()
+	for section: Section in sections:
+		for child: Node in section.get_children():
+			if not child is MeshInstance3D:
+				continue
+			var column := child as MeshInstance3D
+			if not column.is_in_group("mountain_wall"):
+				continue
+			var depth: float = column.scale.y
+			var bounds := AABB(
+				column.global_position-Vector3(0.5,depth*0.5,0.5),
+				Vector3(1,depth,1)
+			)
+			var hit: Variant = bounds.intersects_ray(candidate_position,ray_direction)
+			if hit != null and candidate_position.distance_to(hit) < player_distance:
+				return false
+	return true
+
+func update_camera_clearance() -> void:
+	if map_id == Maps.CLASSIC or not player.visible:
+		clearance_orbit = 0
+		return
+	for angle in [0.0,0.25,-0.25,0.5,-0.5,0.75,-0.75,1.0,-1.0]:
+		if camera_orbit_is_clear(target_orbit+angle):
+			clearance_orbit = angle
+			return
 
 func burst(point: Vector3, color: Color, count: int) -> void:
 	var particles := CPUParticles3D.new()

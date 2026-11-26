@@ -103,6 +103,7 @@ func build_mountain(base: Node3D) -> void:
 			var column := MeshInstance3D.new()
 			column.mesh = column_mesh
 			base.add_child(column)
+			column.add_to_group("mountain_wall")
 			column.scale.y = depth
 			column.position = Vector3(x,top-0.18-depth/2.0,3.5-row)
 			if not cap_meshes.has(height):
